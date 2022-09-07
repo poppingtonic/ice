@@ -5,6 +5,7 @@ Decomposition of paper Q&A using humans and language models
 ## Table of contents
 
 - [Design principles](#design-principles)
+- [Developing ICE using GitHub codespaces]
 - [Running ICE locally](#running-ice-locally)
   - [Requirements](#requirements)
   - [Setup](#setup)
@@ -38,6 +39,15 @@ Decomposition of paper Q&A using humans and language models
   Agents don't know which recipe is calling them. Agents don’t maintain state between subtasks. Agents generally try to complete all subtasks they're asked to complete (however badly), but some will not have implementations for certain task types.
 
 - The **mode** in which a recipe runs is a global setting that can affect every agent call. For instance, whether to use humans or agents. Recipes can also run with certain `RecipeSettings`, which can map a task type to a specific `agent_name`, which can modify which agent is used for that specfic type of task.
+
+## Developing ICE using GitHub Codespaces
+
+A convenient way to develop ICE is to use GitHub codespaces.
+
+1. Go [here](https://github.com/oughtinc/ice9/codespaces) to create a new codespace.
+2. You should to increase the idle timeout, which defaults to 30 minutes.
+3. The development requirements are already installed in the codespace, so you don't need to install Docker or Node. Follow the [setup instructions](#setup) as usual.
+4. To share your visualizations publicly, on the ports pane, change port 3000 to be public.
 
 ## Running ICE locally
 
