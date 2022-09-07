@@ -69,7 +69,7 @@ A convenient way to develop ICE is to use GitHub codespaces.
 1. If running for the first time, install the visualization dependencies:
 
    ```sh
-   cd ui && npm install
+   (cd ui; npm ci)
    ```
 
 1. Start the python application and the visualization tool:
