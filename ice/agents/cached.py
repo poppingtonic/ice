@@ -1,0 +1,81 @@
+from ice.agents.base import Agent
+from ice.settings import settings
+from ice.sqlite_shelf import SQLiteShelf
+
+
+def get_cache_key(fn_name: str, input: str):
+    return f"{fn_name}___{input}"
+
+
+class CachedAgent(Agent):
+    cache: SQLiteShelf
+
+    def __init__(self, base_agent: Agent, cache_name: str = "cached_agent"):
+        cache_file = (settings.CACHE_DIR / "cached_agent.sqlite").as_posix()
+        self.cache = SQLiteShelf(cache_file, cache_name)
+        self.base_agent = base_agent
+
+    async def answer(
+        self,
+        context,
+        question,
+        multiline=False,
+        verbose=False,
+        default="",
+        max_tokens: int | None = None,
+    ) -> str:
+        prompt = context + question  # TODO: add multiline and max_tokens to the prompt
+        key = get_cache_key("answer", prompt)
+        if key in self.cache:
+            return self.cache[key]
+        answer = await self.base_agent.answer(
+            context=context,
+            question=question,
+            multiline=multiline,
+            verbose=verbose,
+            default=default,
+            max_tokens=max_tokens,
+        )
+        self.cache[key] = answer
+        return answer
+
+    async def predict(self, *, context, default="", verbose=False) -> dict[str, float]:
+        key = get_cache_key("predict", context)
+        if key in self.cache:
+            return self.cache[key]
+        prediction = await self.base_agent.predict(
+            context=context, default=default, verbose=verbose
+        )
+        self.cache[key] = prediction
+        return prediction
+
+    async def prompted_classify(
+        self,
+        *,
+        context: str,
+        question: str,
+        choices: tuple[str, ...],
+        default: str | None = None,
+        verbose: bool = False,
+    ) -> tuple[str, float, str | None]:
+        prompt = context + question
+        key = get_cache_key("prompted_classify", prompt)
+        if key in self.cache:
+            return self.cache[key]
+        classification = await self.base_agent.prompted_classify(
+            context=context, question=question, choices=choices, verbose=verbose
+        )
+        self.cache[key] = classification
+        return classification
+
+    async def relevance(
+        self, *, question: str, context: str, verbose=False, default=None
+    ) -> float:
+        key = get_cache_key("relevance", f"{question}___{context}")
+        if key in self.cache:
+            return self.cache[key]
+        relevance = await self.base_agent.relevance(
+            context=context, question=question, verbose=verbose, default=default
+        )
+        self.cache[key] = relevance
+        return relevance
