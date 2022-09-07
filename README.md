@@ -44,8 +44,8 @@ Decomposition of paper Q&A using humans and language models
 
 A convenient way to develop ICE is to use GitHub codespaces.
 
-1. Go [here](https://github.com/oughtinc/ice9/codespaces) to create a new codespace.
-2. Increase the default idle timeout in [your settings](https://github.com/settings/codespaces#default-idle-timeout-header) from 30 minutes to a few hours.
+1. Increase the default idle timeout in [your settings](https://github.com/settings/codespaces#default-idle-timeout-header) from 30 minutes to a few hours.
+2. Go [here](https://github.com/oughtinc/ice9/codespaces) to create a new codespace.
 3. The development requirements are already installed in the codespace, so you don't need to install Docker or Node. Follow the [setup instructions](#setup) as usual.
 4. To share your visualizations publicly, on the ports pane, change port 3000 to be public.
 
