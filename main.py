@@ -36,6 +36,7 @@ def main_cli(
     question_short_name: str | None = None,
     trace: bool = False,
     browser: bool = False,
+    args: dict | None = None,
 ):
     """
     ::
@@ -60,6 +61,7 @@ def main_cli(
             input_files=input_files,
             gold_standard_splits=gold_standard_splits,
             question_short_name=question_short_name,
+            args=args or {},
         )
 
     asyncio.run(main_wrapper())
@@ -68,13 +70,14 @@ def main_cli(
 @trace
 async def main(
     *,
-    mode: Mode = "machine",
-    output_file: str | None = None,
-    json_out: str | None = None,
-    recipe_name: str | None = None,
-    input_files: list[str] | None = None,
-    gold_standard_splits: list[str] | None = None,
-    question_short_name: str | None = None,
+    mode: Mode,
+    output_file: str | None,
+    json_out: str | None,
+    recipe_name: str | None,
+    input_files: list[str] | None,
+    gold_standard_splits: list[str] | None,
+    question_short_name: str | None,
+    args: dict,
 ):
     # User selects recipe
     recipe = await get_recipe(recipe_name, mode)
@@ -89,7 +92,7 @@ async def main(
 
     # Run recipe without paper arguments
     if not papers:
-        result = await recipe.execute()
+        result = await recipe.execute(**args)
         env().print(
             result,
             format_markdown=False,
@@ -98,7 +101,7 @@ async def main(
         return
 
     # Run recipe over papers
-    results_by_doc = await run_recipe_over_papers(recipe, papers)
+    results_by_doc = await run_recipe_over_papers(recipe, papers, args)
 
     # Print results
     results_json = await print_results(recipe, results_by_doc, output_file, json_out)
@@ -159,7 +162,7 @@ async def get_papers(
 
 
 async def run_recipe_over_papers(
-    recipe: Recipe, papers: list[Paper]
+    recipe: Recipe, papers: list[Paper], args: dict
 ) -> dict[str, RecipeResult]:
     """
     Run the recipe over the papers and return a map from paper ids to recipe results.
@@ -167,7 +170,7 @@ async def run_recipe_over_papers(
 
     async def apply_recipe_to_paper(paper: Paper):
         execution_context.new_context(document_id=paper.document_id, task=str(recipe))
-        return await recipe.execute(paper=paper)
+        return await recipe.execute(paper=paper, **args)
 
     # Run recipe over papers
     max_concurrency = 5 if recipe.mode == "machine" else 1
@@ -247,4 +250,4 @@ async def evaluate_results(
 
 
 if __name__ == "__main__":
-    defopt.run(main_cli)
+    defopt.run(main_cli, parsers={dict: json.loads})
