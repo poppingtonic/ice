@@ -18,6 +18,7 @@ from typing import TypeVar
 import anyio
 import tqdm
 
+
 from structlog.stdlib import get_logger
 
 log = get_logger()
@@ -31,12 +32,13 @@ async def map_async(
     input_list: Sequence[InputType_co],
     fn: Callable[[InputType_co], Coroutine[Any, Any, ReturnType_co]],
     max_concurrency: int | None = None,
+    semaphore: anyio.Semaphore | None = None,
     show_progress_bar: bool = False,
 ) -> list[ReturnType_co]:
     result_boxes: list[list[ReturnType_co]] = [[] for _ in input_list]
 
-    max_concurrency = max_concurrency or len(input_list)
-    semaphore = anyio.Semaphore(max_concurrency)
+    if not semaphore:
+        semaphore = anyio.Semaphore(max_concurrency or len(input_list))
 
     if show_progress_bar:
         progress_bar = tqdm.tqdm(total=len(input_list))
@@ -92,7 +94,12 @@ AsyncComparator = Callable[[T, T], Awaitable[int]]
 
 
 async def _nsmallest_async(
-    n: int, items: list[T], cmp: AsyncComparator, offset: int = 0, seed: int = 1
+    n: int,
+    items: list[T],
+    cmp: AsyncComparator,
+    semaphore: anyio.Semaphore | None,
+    offset: int = 0,
+    seed: int = 1,
 ) -> list[T]:
     n = max(0, n)
     if len(items) <= 1 or n == 0:
@@ -105,7 +112,7 @@ async def _nsmallest_async(
 
     # partitions[False] contains items < pivot, partitions[True] contains items >= pivot
     partitions = defaultdict(list)
-    keys = await map_async(items, get_key)
+    keys = await map_async(items, get_key, semaphore=semaphore)
     for item, key in zip(items, keys):
         partitions[key].append(item)
 
@@ -115,15 +122,21 @@ async def _nsmallest_async(
         # that as the seed.
         new_seed = 2 * seed + int(key)
         return key, await _nsmallest_async(
-            n - delta, partitions[key], cmp, offset + delta, new_seed
+            n - delta, partitions[key], cmp, semaphore, offset + delta, new_seed
         )
 
     partitions = defaultdict(list, await map_async(list(partitions), recurse))
     return (partitions[False] + [pivot] + partitions[True])[:n]
 
 
-async def nsmallest_async(n: int, items: Iterable[T], cmp: AsyncComparator) -> list[T]:
-    return await _nsmallest_async(n, list(items), cmp)
+async def nsmallest_async(
+    n: int,
+    items: Iterable[T],
+    cmp: AsyncComparator,
+    max_concurrency: int | None = None,
+) -> list[T]:
+    semaphore = anyio.Semaphore(max_concurrency) if max_concurrency else None
+    return await _nsmallest_async(n, list(items), cmp, semaphore)
 
 
 def flatten(xs: Iterable[Iterable[T]]) -> list[T]:
