@@ -48,7 +48,6 @@ def get_gold_placebo(paper_id: str, experiment: str) -> str | None:
 
 class PlaceboDescription(Recipe):
     agent_str: str
-    name = "PlaceboDescription"
 
     def make_prompt(self, paper: Paper, experiment: str) -> str:
         raise NotImplementedError()

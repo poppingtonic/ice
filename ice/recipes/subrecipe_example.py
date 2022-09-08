@@ -6,8 +6,6 @@ log = get_logger()
 
 
 class MesaRecipe(Recipe):
-    name = "MesaRecipe"
-
     async def execute(self, **kw) -> list[str]:
         input: list[str] = kw["input"]
         assert input, "MesaRecipe requires an 'input' argument"
@@ -24,8 +22,6 @@ class MesaRecipe(Recipe):
 
 
 class ExampleMetaRecipe(Recipe):
-    name = "MetaRecipe"
-
     async def execute(self, **_kw):
         other_recipe = MesaRecipe(mode=self.mode)
         sub_result = await other_recipe.execute(input=["MetaRecipe"])

@@ -35,12 +35,12 @@ def select_question(default_value: str | None = None):
 
 def select_recipe_class(*, default_value: str | None = None) -> Type[Recipe]:
     recipe_classes = get_recipe_classes()
-    recipe_names = [r.name for r in recipe_classes]
+    recipe_names = [r.__name__ for r in recipe_classes]
     extra_params = {}
     if default_value is not None:
         extra_params["index"] = recipe_names.index(default_value)
     recipe_name = st.sidebar.selectbox("Select a recipe", recipe_names, **extra_params)
-    recipe_class = [r for r in recipe_classes if r.name == recipe_name][0]
+    recipe_class = [r for r in recipe_classes if r.__name__ == recipe_name][0]
     return recipe_class
 
 
@@ -66,6 +66,6 @@ def select_paper(*, default_value: str | None = None):
 
 def run_recipe(recipe: Recipe, paper: Paper):
     execution_context.new_context(document_id=paper.document_id, task="n/a")
-    with st.spinner(f"Running recipe '{recipe.name}'"):
+    with st.spinner(f"Running recipe '{recipe}'"):
         result = asyncio.run(recipe.execute(question="n/a", paper=paper))
     return result

@@ -130,7 +130,6 @@ The paragraph: "{paragraph}"
 
 class PlaceboDialogs(Recipe):
 
-    name = "Placebo via paragraph-wise dialogs"
     verbose = False
 
     msg = SimpleNamespace(

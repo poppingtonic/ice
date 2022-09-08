@@ -53,8 +53,6 @@ def create_recipe_result(paper_id: str, experiment: str, answer: str) -> RecipeR
 
 
 class FunnelSimple(Recipe):
-    name = "FunnelSimple"
-
     async def execute(self, **kw):
         paper: Paper = kw["paper"]
 

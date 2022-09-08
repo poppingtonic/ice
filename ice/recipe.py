@@ -28,12 +28,9 @@ def is_list_of_recipe_result(value: object) -> TypeGuard[list[RecipeResult]]:
 
 
 class Recipe(TracedABC, Generic[RecipeSettings]):
-    name = "Recipe"
     defaults: Callable[["Recipe"], RecipeSettings] = lambda self: BaseSettings()  # type: ignore[assignment, return-value]
 
-    def __init__(
-        self, mode: Mode = "augmented", settings: RecipeSettings | None = None
-    ):
+    def __init__(self, mode: Mode = "machine", settings: RecipeSettings | None = None):
         self.mode = mode
         self.s = settings or self.defaults()
         self.results: list[RecipeResult] = []
@@ -60,7 +57,7 @@ class Recipe(TracedABC, Generic[RecipeSettings]):
 
     async def evaluation_report(self) -> EvaluationReport:
         return EvaluationReport(
-            technique_name=self.name,
+            technique_name=str(self),
             results=await map_async(
                 self.results, EvaluatedRecipeResult.from_recipe_result
             ),
@@ -71,3 +68,6 @@ class Recipe(TracedABC, Generic[RecipeSettings]):
 
     def max_concurrency(self) -> int:
         return 10 if self.mode == "machine" else 1
+
+    def __str__(self) -> str:
+        return self.__class__.__name__

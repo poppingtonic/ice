@@ -9,8 +9,6 @@ SEARCH_TERMS = ["adhere", "take-up", "compliance", "attrition"]
 
 
 class AdherenceKeywordBaseline(Recipe):
-    name = "AdherenceKeywordBaseline"
-
     @staticmethod
     def answer_adherence_using_keywords(paper: Paper) -> str:
         for term in SEARCH_TERMS:

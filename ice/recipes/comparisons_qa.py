@@ -31,8 +31,6 @@ Question: {question_long}
 
 
 class ComparisonsQA(Recipe):
-    name = "ComparisonsQA"
-
     async def execute(self, **kw):
         paper: Paper = kw["paper"]
         question_short: str = kw.get(

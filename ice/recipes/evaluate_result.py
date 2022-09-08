@@ -141,8 +141,6 @@ class ResultComparison(BaseModel):
 
 
 class EvaluateResult(Recipe):
-    name = "EvaluateResult"
-
     async def execute(self, **kw) -> ResultComparison:
 
         model_result: str

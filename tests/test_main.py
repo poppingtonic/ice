@@ -19,7 +19,7 @@ def do_not_test(recipe: Type[Recipe]) -> bool:
 
 @pytest.mark.parametrize(
     "recipe_name",
-    [recipe.name for recipe in get_recipe_classes() if not do_not_test(recipe)],
+    [recipe.__name__ for recipe in get_recipe_classes() if not do_not_test(recipe)],
 )
 @pytest.mark.anyio
 async def test_recipes(recipe_name: str):

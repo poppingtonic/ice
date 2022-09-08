@@ -21,7 +21,6 @@ class AdherenceSimpleInstruct(SinglePrompt):
     qa_prompt_template = qa_prompt_template
     question_short_name = QUESTION_SHORT_NAME
     default_answer_classification = DEFAULT_ANSWER_CLASSIFICATION
-    name = "AdherenceSimpleInstruct"
 
 
 class AdherenceSimpleAnthropic(SinglePrompt):
@@ -30,4 +29,3 @@ class AdherenceSimpleAnthropic(SinglePrompt):
     qa_prompt_template = qa_prompt_template
     question_short_name = QUESTION_SHORT_NAME
     default_answer_classification = DEFAULT_ANSWER_CLASSIFICATION
-    name = "AdherenceSimpleAnthropic"

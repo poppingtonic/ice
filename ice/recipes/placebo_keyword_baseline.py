@@ -18,8 +18,6 @@ class PlaceboAnswer:
 
 
 class PlaceboKeywordBaseline(Recipe):
-    name = "PlaceboKeywordBaseline"
-
     @staticmethod
     def answer_placebo_using_keywords(paper: Paper) -> PlaceboAnswer:
         """
