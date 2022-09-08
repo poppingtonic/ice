@@ -30,7 +30,7 @@
 6. Test the recipe on papers with iteration gold standards:
 
    ```
-   $ ./scripts/run-cli.sh -m machine -r placebotree -q placebo -g iterate -o log.txt
+   $ ./scripts/run-recipe.sh -m machine -r placebotree -q placebo -g iterate -o log.txt
    ```
 
 7. If the overall metrics are worse than the previous scores, continue iteration on 1-5. If the metrics are better, or if you want to record your state of work even though they're not, you can now submit your new recipe and evaluation.
