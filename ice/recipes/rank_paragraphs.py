@@ -25,8 +25,6 @@ Answer: Paragraph""".strip()
 
 
 class RankParagraphs(Recipe):
-    name = "RankParagraphs"
-
     async def execute(self, **kw) -> list[Paragraph]:
         """
         Rank the paragraphs by how well they answers the question

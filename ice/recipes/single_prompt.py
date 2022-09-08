@@ -37,7 +37,6 @@ class SinglePrompt(Recipe):
     qa_prompt_template: str
     question_short_name: str
     default_answer_classification: str | None
-    name: str
 
     async def execute(self, **kw):
         paper: Paper = kw["paper"]

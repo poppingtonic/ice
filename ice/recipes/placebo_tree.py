@@ -253,8 +253,6 @@ Answer:"""
 
 
 class PlaceboTree(Recipe):
-    name = "PlaceboTree: Placebo via paragraph-wise decomposition trees"
-
     async def execute(self, **kw):
         paper: Paper = kw["paper"]
 

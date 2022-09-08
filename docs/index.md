@@ -4,6 +4,14 @@ In this tutorial we'll learn how to get language models to do complex tasks by c
 
 We'll call programs that describe such compositions _recipes_.
 
+## Contents
+
+{:toc}
+
+## Before we start
+
+This tutorial requires that you've set up ICE as described in [the ICE README](https://github.com/oughtinc/ice9#interactive-composition-explorer-).
+
 ## The simplest recipe: Hello world!
 
 Let's first get used to the infrastructure for writing, running, and debugging recipes:
@@ -16,14 +24,12 @@ from ice.recipe import Recipe
 class HelloWorld(Recipe):
     async def execute(self, **kw):
         return "Hello world!"
-
-HelloWorld()
 ```
 
 Run the recipe:
 
 ```sh
-scripts/run-recipe.sh hello_world -t -b
+scripts/run-recipe.sh -r helloworld -t -b
 ```
 
 This will run the recipe, creating an execution trace (`-t`) and showing it in a browser window (`-b`).
@@ -34,20 +40,18 @@ On the terminal, you should see this:
 Hello world!
 ```
 
-Your browser should look like this:
-
-(picture)
+In your browser you should see a function node that you can click on, expand, and inspect inputs/outputs and source code.
 
 Some things to note about the recipe:
 
-- [FIXME] We're inhering from the `Recipe` because that will give us automatic tracing of all methods for debugging (what else?)
-- [FIXME] `execute` is the name of the method that is called when a recipe is run
+- We're inhering from the `Recipe` class because that will give us automatic tracing of all async methods for debugging. (Synchronous methods are currently assumed to be simple and fast, and not worth tracing.)
+- `execute` is the name of the method that is called when a recipe is run
 - Most recipe methods, including `execute`, will be async so that language model calls are parallelized as much as possible.
-- [FIXME] Different recipes take different arguments, which will be provided as keyword arguments captured by `**kw`.
+- Different recipes take different arguments, which will be provided as keyword arguments captured by `**kw`. This recipe doesn't use any arguments--we're just accepting `**kw` to make the function type consistent.
 
 ### Exercises
 
-1. Add another method to `HelloWorld` and call it from `execute`. Does this show up in the trace?
+1. Add another method to `HelloWorld` and call it from `execute`. Does it show up in the trace? What if you make it async and call it as `result = await self.my_function()`?
 
 ## Calling an agent: Q&A
 
@@ -70,17 +74,17 @@ class QA(Recipe):
 
 We can run recipes in different modes, which controls what type of agent is used. Some examples:
 
-- `human`: Elicit answers from you using a command-line interface
-- `machine`: Use an automated agent (usually GPT-3 if no hint is provided in the agent call)
-- `augmented`: Elicit answers from you, but providing the machine-generated answer as a default
+- `machine`: Use an automated agent (usually GPT-3 if no hint is provided in the agent call). This is the default mode.
+- `human`: Elicit answers from you using a command-line interface.
+- `augmented`: Elicit answers from you, but providing the machine-generated answer as a default.
 
 You specify the mode like this:
 
 ```sh
-scripts/run-recipe.sh qa -t -b -m human
+scripts/run-recipe.sh -r qa -t -b -m human
 ```
 
-Try it!
+Try running your recipe in different modes.
 
 Things to note:
 
@@ -177,8 +181,7 @@ If you want to challenge yourself, pause and see if you can use the pieces above
 Once you're ready, or if you just want to see the result, take a look at this recipe:
 
 ```py
-class DebateRecipe(DynamicRecipe):
-    name = "Debate"
+class DebateRecipe(Recipe):
 
     async def execute(self, **kw):
         question = kw.get("question", "Should we legalize all drugs?")
@@ -206,7 +209,7 @@ class DebateRecipe(DynamicRecipe):
 Once you've saved the recipe in `debate.py` you can run it as usual:
 
 ```sh
-scripts/run-recipe.sh debate -t -b -m machine
+scripts/run-recipe.sh -r debate -t -b
 ```
 
 Some things to note:

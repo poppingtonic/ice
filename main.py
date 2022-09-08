@@ -92,7 +92,7 @@ async def main(
     papers = await get_papers(input_files, gold_standard_splits, question_short_name)
 
     print(
-        f"Running recipe {recipe.name} over papers {', '.join(p.document_id for p in papers)}"
+        f"Running recipe {recipe} over papers {', '.join(p.document_id for p in papers)}"
     )
 
     # Run recipe
@@ -177,7 +177,7 @@ async def run_recipe_over_papers(
     """
 
     async def apply_recipe_to_paper(paper: Paper):
-        execution_context.new_context(document_id=paper.document_id, task=recipe.name)
+        execution_context.new_context(document_id=paper.document_id, task=str(recipe))
         return await recipe.execute(paper=paper)
 
     # Run recipe over papers

@@ -9,7 +9,6 @@ class AllQuotesRecipe(Recipe):
     # Used to view paper parses
     # and to test whether the gold standard quotes we're looking for
     # are actually in the parses
-    name = "Return all quotes in parse"
     question_short_name_to_test = "placebo"
 
     async def execute(self, **kw):

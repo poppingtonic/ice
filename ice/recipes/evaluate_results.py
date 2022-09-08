@@ -9,8 +9,6 @@ log = get_logger()
 
 
 class EvaluateResults(Recipe):
-    name = "EvaluateResults"
-
     async def execute(self, **kw) -> list[ResultComparison]:
         """
         Compare two lists of results, model and gold standard.

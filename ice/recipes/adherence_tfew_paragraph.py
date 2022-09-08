@@ -806,7 +806,6 @@ class AdherenceTfewSettings(BaseSettings):
 
 
 class AdherenceParagraphTfew(Recipe):
-    name = "adherence-paragraph-tfew"
     defaults = lambda self: AdherenceTfewSettings()  # noqa: E731
 
     async def is_possibly_adherence_sentence(

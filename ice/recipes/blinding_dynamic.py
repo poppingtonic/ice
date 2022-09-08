@@ -246,8 +246,6 @@ def make_followup_paragraph_prompt(
 
 
 class BlindingDynamic(Recipe):
-    name = "Dynamic blinding recipe"
-
     async def interventions(self, paper: Paper) -> list[str]:
         return list_experiments(document_id=paper.document_id)
 
