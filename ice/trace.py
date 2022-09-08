@@ -1,4 +1,5 @@
 import json
+import os
 
 from abc import ABCMeta
 from asyncio import create_task
@@ -36,6 +37,12 @@ trace_dir.mkdir(exist_ok=True)
 trace_file: IO[str] | None = None
 
 
+def _url_prefix():
+    if "CODESPACE_NAME" in os.environ:
+        return f"https://{os.environ['CODESPACE_NAME']}-3000.githubpreview.dev"
+    return "http://localhost:3000"
+
+
 def enable_trace(browser: bool = False):
     global trace_file
 
@@ -43,7 +50,7 @@ def enable_trace(browser: bool = False):
 
     # "Opening trace" is matched by scripts/open_in_browser.py, which runs on the host.
     prefix = "Opening trace" if browser else "Trace"
-    print(f"{prefix}: http://localhost:3000/traces/{trace_id}")
+    print(f"{prefix}: {_url_prefix()}/traces/{trace_id}")
 
 
 trace_dir = Path(__file__).parent.parent / "ui" / "public" / "traces"
