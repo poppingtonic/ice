@@ -483,6 +483,16 @@ const SourceContent = ({ source }: SourceContentProps) => {
   );
 };
 
+type Bindings = Record<string, () => void>;
+
+const withVimBindings = (bindings: Bindings): Bindings => ({
+  ...bindings,
+  h: bindings.ArrowLeft,
+  j: bindings.ArrowDown,
+  k: bindings.ArrowUp,
+  l: bindings.ArrowRight,
+});
+
 const stripIndent = (source: string): string => {
   // Find the minimum number of leading spaces on any non-empty line
   const indent = source
@@ -522,7 +532,7 @@ const Trace = ({ traceId }: { traceId: string }) => {
   const bindings = useMemo(
     () =>
       (selectedId
-        ? {
+        ? withVimBindings({
             ArrowUp: () =>
               maybeSetSelectedId(id => {
                 let lastDescendantOfPrior = getPrior(id);
@@ -540,8 +550,8 @@ const Trace = ({ traceId }: { traceId: string }) => {
                 ? setExpanded(selectedId, false)
                 : maybeSetSelectedId(getParent),
             ArrowRight: () => getChildren(selectedId).length && setExpanded(selectedId, true),
-          }
-        : {}) as Record<string, () => void>,
+          })
+        : {}) as Bindings,
     [
       getChildren,
       getExpandedChildren,
