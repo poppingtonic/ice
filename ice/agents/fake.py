@@ -12,12 +12,13 @@ class FakeAgent(Agent):
     def __init__(self):
         self.fake = Faker()
 
-    async def relevance(self, question, context, verbose=False, default=None):
+    async def relevance(self, *, question, context, verbose=False, default=None):
         return random.random()
 
     async def answer(
         self,
-        context,
+        *,
+        context="",
         question,
         multiline=False,
         verbose=False,
@@ -29,7 +30,7 @@ class FakeAgent(Agent):
     async def prompted_classify(
         self,
         *,
-        context: str,
+        context: str = "",
         question: str,
         choices: tuple[str, ...],
         default: str | None = None,

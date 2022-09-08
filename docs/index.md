@@ -61,16 +61,20 @@ Now let's make our first recipe `qa.py` that calls out to an agent.
 ```py
 from ice.recipe import Recipe
 
+
 def make_qa_prompt(question: str) -> str:
-    return f"""
-Question: {question}
-Answer:""".strip()
+    return f"""Answer the following question:
+
+Question: "{question}"
+Answer: "
+""".strip()
+
 
 class QA(Recipe):
     async def execute(self, **kw):
         question = kw.get("question", "What is happening on 9/9/2022?")
         prompt = make_qa_prompt(question)
-        answer = await self.agent().answer(context="", question=question)
+        answer = (await self.agent().answer(question=prompt)).strip('" ')
         return answer
 ```
 
@@ -95,6 +99,8 @@ Things to note:
 ### Exercises
 
 1. Instead of answering directly, add "Let's think step by step" as a prefix to the answer part of the prompt.
+2. After getting the answer, add another step that shows the question and answer to the agent and asks it to improve the answer.
+3. Like exercise 2, but iterate the improvement step until the answer stops changing or some # of steps is exceeded. Does this work?
 
 ## Composing calls to agents: Debate
 
@@ -170,9 +176,9 @@ When we apply it to the debate above, we get:
 >>> print(render_debate_prompt("Bob", my_debate, 5))
 You are Bob. There are 5 turns left in the debate. You are trying to win the debate using reason and evidence. Don't repeat yourself. No more than 1-2 sentences per turn.
 
-Alice: "I think we should legalize all drugs.
-You: "I'm against.
-Alice: "The war on drugs has been a failure. It's time to try something new.
+Alice: "I think we should legalize all drugs."
+You: "I'm against."
+Alice: "The war on drugs has been a failure. It's time to try something new."
 You: "
 ```
 
@@ -206,7 +212,7 @@ class DebateRecipe(Recipe):
     ):
         prompt = render_debate_prompt(agent_name, debate, turns_left)
         answer = await agent.answer(
-            context="", question=prompt, multiline=False, max_tokens=100
+            question=prompt, multiline=False, max_tokens=100
         )
         return (agent_name, answer.strip('" '))
 ```
@@ -228,14 +234,14 @@ Some things to note:
 ## Future tutorial topics
 
 - Reasoning about external content: Papers
-- Parts of recipes we've written
+- Other recipe components we've written, e.g. paragraph ranking
 - Subrecipes: Amplification
-- Agent methods: relevance etc
+- Agent methods: Relevance etc
+- Agent combinators
+  - Machine agent with human spot checking
 - Better agents: OpenAIReasoning
-  - chain-of-thought + plurality voting
+  - Chain-of-thought + plurality voting
 - Special-purpose models & model hints
 - Filters & verifiers
 - Selection-Inference
-- Other structures from Cascades paper
-- Agent combinators
-  - Machine agent with human spot checking
+- Other structures from Cascades, Prompt Chainer, and Maeutic prompting paper

@@ -8,7 +8,9 @@ class AugmentedAgent(Agent):
         self.human = human
         self.machine = machine
 
-    async def relevance(self, question, context, verbose=False, default=None) -> float:
+    async def relevance(
+        self, *, question, context, verbose=False, default=None
+    ) -> float:
         machine_resp = await self.machine.relevance(
             question=question, context=context, verbose=verbose
         )
@@ -19,7 +21,8 @@ class AugmentedAgent(Agent):
 
     async def answer(
         self,
-        context,
+        *,
+        context="",
         question,
         multiline=False,
         verbose=False,
@@ -57,7 +60,7 @@ class AugmentedAgent(Agent):
     async def prompted_classify(
         self,
         *,
-        context: str,
+        context: str = "",
         question: str,
         choices: tuple[str, ...],
         default: str | None = None,

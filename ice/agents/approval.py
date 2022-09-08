@@ -45,7 +45,8 @@ class ApprovalAgent(Agent):
 
     async def answer(
         self,
-        context,
+        *,
+        context="",
         question,
         multiline=False,
         verbose=False,
@@ -63,7 +64,7 @@ class ApprovalAgent(Agent):
         await self._check(prompt=question, candidate=completion)
         return completion
 
-    async def relevance(self, question, context, verbose=False, default=None):
+    async def relevance(self, *, question, context, verbose=False, default=None):
         score = await self.base_agent.relevance(
             question=question, context=context, verbose=verbose, default=default
         )

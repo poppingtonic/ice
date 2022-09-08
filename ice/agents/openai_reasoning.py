@@ -31,7 +31,7 @@ class OpenAIReasoningAgent(Agent):
     async def answer(
         self,
         *,
-        context: str,
+        context: str = "",
         question: str,
         multiline: bool = False,
         verbose: bool = False,
@@ -48,7 +48,7 @@ class OpenAIReasoningAgent(Agent):
     async def prompted_classify(
         self,
         *,
-        context: str,
+        context: str = "",
         question: str,
         choices: tuple[str, ...],
         default: str | None = None,
