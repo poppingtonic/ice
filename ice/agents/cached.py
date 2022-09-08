@@ -17,7 +17,8 @@ class CachedAgent(Agent):
 
     async def answer(
         self,
-        context,
+        *,
+        context="",
         question,
         multiline=False,
         verbose=False,
@@ -52,7 +53,7 @@ class CachedAgent(Agent):
     async def prompted_classify(
         self,
         *,
-        context: str,
+        context: str = "",
         question: str,
         choices: tuple[str, ...],
         default: str | None = None,

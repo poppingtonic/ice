@@ -27,7 +27,7 @@ class TFew(Agent):
     async def prompted_classify(
         self,
         *,
-        context: str,
+        context: str = "",
         question: str,
         choices: tuple[str, ...],
         default: str | None = None,

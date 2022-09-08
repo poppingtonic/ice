@@ -6,7 +6,7 @@ class HumanAgent(Agent):
     async def answer(
         self,
         *,
-        context,
+        context="",
         question,
         multiline=False,
         verbose=False,
@@ -19,7 +19,9 @@ class HumanAgent(Agent):
         )
         return completion
 
-    async def relevance(self, question, context, verbose=False, default=None) -> float:
+    async def relevance(
+        self, *, question, context, verbose=False, default=None
+    ) -> float:
         verbose  # ignored for HumanAgent
         score = await env().score(question, context, default=default)
         return score
@@ -34,7 +36,7 @@ class HumanAgent(Agent):
     async def prompted_classify(
         self,
         *,
-        context: str,
+        context: str = "",
         question: str,
         choices: tuple[str, ...],
         default: str | None = None,

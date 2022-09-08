@@ -31,7 +31,7 @@ class AnthropicAgent(Agent):
     async def answer(
         self,
         *,
-        context: str,
+        context: str = "",
         question: str,
         multiline: bool = False,
         verbose: bool = False,

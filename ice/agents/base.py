@@ -2,6 +2,8 @@ from ice.trace import TracedABC
 
 
 class Agent(TracedABC):
+    label: str | None = None
+
     async def relevance(
         self,
         *,
@@ -15,7 +17,7 @@ class Agent(TracedABC):
     async def answer(
         self,
         *,
-        context: str,
+        context: str = "",
         question: str,
         multiline: bool = False,
         verbose: bool = False,
@@ -32,7 +34,7 @@ class Agent(TracedABC):
     async def prompted_classify(
         self,
         *,
-        context: str,
+        context: str = "",
         question: str,
         choices: tuple[str, ...],
         default: str | None = None,
