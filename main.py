@@ -170,8 +170,12 @@ async def run_recipe_over_papers(
         return await recipe.execute(paper=paper)
 
     # Run recipe over papers
+    max_concurrency = 5 if recipe.mode == "machine" else 1
     results = await map_async(
-        papers, apply_recipe_to_paper, show_progress_bar=True, max_concurrency=5
+        papers,
+        apply_recipe_to_paper,
+        show_progress_bar=True,
+        max_concurrency=max_concurrency,
     )
 
     return {paper.document_id: result for (paper, result) in zip(papers, results)}
