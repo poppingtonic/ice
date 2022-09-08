@@ -38,8 +38,8 @@ trace_file: IO[str] | None = None
 
 
 def _url_prefix():
-    if "CODESPACE_NAME" in os.environ:
-        return f"https://{os.environ['CODESPACE_NAME']}-3000.githubpreview.dev"
+    if codespace := os.environ.get("CODESPACE_NAME"):
+        return f"https://{codespace}-3000.githubpreview.dev"
     return "http://localhost:3000"
 
 
