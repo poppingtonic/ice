@@ -148,6 +148,9 @@ When we render debates, we also provide the option to replace an agent name with
 
 ```py
 >>> print(render_debate(my_debate, self_name="Alice"))
+```
+
+```
 You: "I think we should legalize all drugs."
 Bob: "I'm against."
 You: "The war on drugs has been a failure. It's time to try something new."
@@ -174,6 +177,9 @@ When we apply it to the debate above, we get:
 
 ```py
 >>> print(render_debate_prompt("Bob", my_debate, 5))
+```
+
+```
 You are Bob. There are 5 turns left in the debate. You are trying to win the debate using reason and evidence. Don't repeat yourself. No more than 1-2 sentences per turn.
 
 Alice: "I think we should legalize all drugs."
@@ -221,6 +227,22 @@ Once you've saved the recipe in `debate.py` you can run it as usual:
 
 ```sh
 scripts/run-recipe.sh -r debate.py -t -b
+```
+
+You should see a debate like this:
+
+```
+Question: "Should we legalize all drugs?"
+Alice: "I'm in favor."
+Bob: "I'm against."
+Alice: "The war on drugs has been a failure. It's time to try something new."
+Bob: "Legalizing drugs would lead to more drug use and more addiction. It's not the answer."
+Alice: "There is evidence that drug use would go down when drugs are legalized. In Portugal, where all drugs have been legal since 2001, drug use has declined among young people."
+Bob: "Even if drug use declines, the number of addicts will increase. And more addicts means more crime."
+Alice: "Addiction rates would not necessarily increase. In fact, they could go down, because people would have better access to treatment."
+Bob: "Treatment is expensive, and most addicts can't afford it. Legalizing drugs would just make the problem worse."
+Alice: "The government could fund treatment programs. And people would be less likely to need treatment if they could get drugs legally."
+Bob: "It's not that simple. Legalizing drugs would create a lot of new problems."
 ```
 
 Some things to note:
