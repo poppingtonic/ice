@@ -4,8 +4,7 @@ In this tutorial we'll learn how to get language models to do complex tasks by c
 
 We'll call programs that describe such compositions _recipes_.
 
-## Contents
-
+* TOC
 {:toc}
 
 ## Before we start
