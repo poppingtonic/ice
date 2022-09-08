@@ -18,7 +18,6 @@ from typing import TypeVar
 import anyio
 import tqdm
 
-
 from structlog.stdlib import get_logger
 
 log = get_logger()
