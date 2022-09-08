@@ -30,10 +30,12 @@ class HelloWorld(Recipe):
 Run the recipe:
 
 ```sh
-scripts/run-recipe.sh -r hello_world.py -t -b
+scripts/run-recipe.sh -r hello_world.py -t
 ```
 
-This will run the recipe, creating an execution trace (`-t`) and showing it in a browser window (`-b`).
+This will run the recipe, creating an execution trace (`-t`).
+
+If you'd like to automatically open a browser window, add `-b`, but note that this will only work if your system has the `open` or `xdg-open` command, and in particular, won't work in a Codespace.
 
 On the terminal, after a few lines about Docker and the trace link, you should see this:
 
@@ -41,7 +43,7 @@ On the terminal, after a few lines about Docker and the trace link, you should s
 Hello world!
 ```
 
-In your browser you should see a function node that you can click on, expand, and inspect inputs/outputs and source code.
+If you follow the link, in your browser you should see a function node that you can click on, expand, and inspect inputs/outputs and source code.
 
 Some things to note about the recipe:
 
@@ -87,7 +89,7 @@ We can run recipes in different modes, which controls what type of agent is used
 You specify the mode like this:
 
 ```sh
-scripts/run-recipe.sh -r qa.py -t -b -m human
+scripts/run-recipe.sh -r qa.py -t -m human
 ```
 
 Try running your recipe in different modes.
@@ -226,7 +228,7 @@ class DebateRecipe(Recipe):
 Once you've saved the recipe in `debate.py` you can run it as usual:
 
 ```sh
-scripts/run-recipe.sh -r debate.py -t -b
+scripts/run-recipe.sh -r debate.py -t
 ```
 
 You should see a debate like this:
