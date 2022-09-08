@@ -9,7 +9,11 @@ def open_in_browser(url):
     try:
         run(["open", url])
     except FileNotFoundError:
-        run(["xdg-open", url])
+        try:
+            run(["xdg-open", url])
+        except FileNotFoundError:
+            print("Failed to open the trace automatically.")
+            pass
 
 
 opening_pattern = re.compile(r"Opening trace: (http.*)")
