@@ -229,7 +229,3 @@ Some things to note:
 - Filters & verifiers
 - Selection-Inference
 - Other structures from Cascades paper
-
----
-
-[Edit on GitHub]({{ site.github.repository_url }}/edit/{{ site.github.source.branch }}/{{ site.github.source.path }})
