@@ -15,7 +15,6 @@ class Settings(BaseSettings):
     OPENAI_API_KEY: str
     OPENAI_ORG_ID: str
     OUGHT_INFERENCE_URL: AnyHttpUrl = "https://inference.elicit.org"
-    DATABASE_URL: str
     ANTHROPIC_API_KEY: str | None = None
     ANTHROPIC_BACKEND: str = "feedback-test.he.anthropic.com"
     MAX_ANTHROPIC_TOKENS: int = 100

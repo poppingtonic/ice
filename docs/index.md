@@ -17,7 +17,7 @@ This tutorial requires that you've set up ICE as described in [the ICE README](h
 
 Let's first get used to the infrastructure for writing, running, and debugging recipes:
 
-Make a file `hello_world.py` in `ice/recipes/`:
+Create a file `hello_world.py`:
 
 ```py
 from ice.recipe import Recipe
@@ -30,12 +30,12 @@ class HelloWorld(Recipe):
 Run the recipe:
 
 ```sh
-scripts/run-recipe.sh -r helloworld -t -b
+scripts/run-recipe.sh -r hello_world.py -t -b
 ```
 
 This will run the recipe, creating an execution trace (`-t`) and showing it in a browser window (`-b`).
 
-On the terminal, you should see this:
+On the terminal, after a few lines about Docker and the trace link, you should see this:
 
 ```
 Hello world!
@@ -56,7 +56,7 @@ Some things to note about the recipe:
 
 ## Calling an agent: Q&A
 
-Now let's make our first recipe that calls out to an agent.
+Now let's make our first recipe `qa.py` that calls out to an agent.
 
 ```py
 from ice.recipe import Recipe
@@ -67,9 +67,10 @@ Question: {question}
 Answer:""".strip()
 
 class QA(Recipe):
-    async def execute(self, question: str):
+    async def execute(self, **kw):
+        question = kw.get("question", "What is happening on 9/9/2022?")
         prompt = make_qa_prompt(question)
-        answer = await self.agent().answer(context="", question=question)  # FIXME: Use prompt arg
+        answer = await self.agent().answer(context="", question=question)
         return answer
 ```
 
@@ -82,7 +83,7 @@ We can run recipes in different modes, which controls what type of agent is used
 You specify the mode like this:
 
 ```sh
-scripts/run-recipe.sh -r qa -t -b -m human
+scripts/run-recipe.sh -r qa.py -t -b -m human
 ```
 
 Try running your recipe in different modes.
@@ -182,6 +183,9 @@ If you want to challenge yourself, pause and see if you can use the pieces above
 Once you're ready, or if you just want to see the result, take a look at this recipe:
 
 ```py
+from ice.agents.base import Agent
+from ice.recipe import Recipe
+
 class DebateRecipe(Recipe):
 
     async def execute(self, **kw):
@@ -204,13 +208,13 @@ class DebateRecipe(Recipe):
         answer = await agent.answer(
             context="", question=prompt, multiline=False, max_tokens=100
         )
-        return debate + [(agent_name, answer.strip())]
+        return (agent_name, answer.strip('" '))
 ```
 
 Once you've saved the recipe in `debate.py` you can run it as usual:
 
 ```sh
-scripts/run-recipe.sh -r debate -t -b
+scripts/run-recipe.sh -r debate.py -t -b
 ```
 
 Some things to note:
@@ -221,7 +225,7 @@ Some things to note:
 
 1. Add a judge agent at the end that decides which agent won the debate. In the original debate proposal, these judgments would be used to RL-finetune the parameters of the debate agents.
 
-## Future topics
+## Future tutorial topics
 
 - Reasoning about external content: Papers
 - Parts of recipes we've written
@@ -233,3 +237,5 @@ Some things to note:
 - Filters & verifiers
 - Selection-Inference
 - Other structures from Cascades paper
+- Agent combinators
+  - Machine agent with human spot checking
