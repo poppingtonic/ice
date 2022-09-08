@@ -451,7 +451,7 @@ type InputOutputContentProps = {
 const InputOutputContent = ({ args, records, result }: InputOutputContentProps) => (
   <>
     <Json name="Inputs" value={args} />
-    {!isEmpty(records) && <Json name="Records" value={records} />}
+    {!isEmpty(records) && <Json name="Records" value={Object.values(records)} />}
     <Json name="Outputs" value={result} />
   </>
 );
