@@ -36,9 +36,22 @@ Decomposition of paper Q&A using humans and language models
 A convenient way to develop ICE is to use GitHub codespaces.
 
 1. Increase the default idle timeout in [your settings](https://github.com/settings/codespaces#default-idle-timeout-header) from 30 minutes to a few hours.
-2. Go [here](https://github.com/oughtinc/ice9/codespaces) to create a new codespace.
-3. The development requirements are already installed in the codespace, so you don't need to install Docker or Node. Follow the [setup instructions](#setup) as usual.
-4. To share your visualizations publicly, on the ports pane (F1 to open the command palette -> "Ports: Focus on Ports View"), change port 3000 to be public (Right Click -> Port Visibility -> Public), and click the 🌐 icon in the "Local Address" field to get the link.
+1. Go [here](https://github.com/oughtinc/ice9/codespaces) to create a new codespace.
+1. Install the frontend dependencies:
+
+   ```sh
+   (cd ui; npm ci)
+   ```
+
+1. Start ICE in its own terminal:
+
+   ```sh
+   scripts/run-local.sh
+   ```
+
+1. To share your visualizations publicly, on the ports pane (F1 to open the command palette -> "Ports: Focus on Ports View"), change port 3000 to be public (Right Click -> Port Visibility -> Public), and click the 🌐 icon in the "Local Address" field to get the link.
+
+1. Follow the [instructions to run a recipe](#running-ice-on-the-command-line).
 
 ## Running ICE locally
 
@@ -57,17 +70,19 @@ A convenient way to develop ICE is to use GitHub codespaces.
    echo 'OUGHT_INFERENCE_API_KEY="fe7...6"' >> .env
    ```
 
-1. If running for the first time, install the visualization dependencies:
+1. Install the frontend dependencies:
 
    ```sh
    (cd ui; npm ci)
    ```
 
-1. Start the python application and the visualization tool:
+1. Start ICE in its own terminal:
 
    ```sh
-   ./scripts/run-local.sh
+   scripts/run-local.sh
    ```
+
+1. Follow the [instructions to run a recipe](#running-ice-on-the-command-line).
 
 ### Setup for Anthropic models
 
