@@ -12,7 +12,7 @@ def open_in_browser(url):
         try:
             run(["xdg-open", url])
         except FileNotFoundError:
-            # Unable to open browser: do nothing.
+            print("Failed to open the trace automatically.")
             pass
 
 
