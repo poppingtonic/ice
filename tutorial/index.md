@@ -1,9 +1,8 @@
-# Tutorial: Language models decompositions
+# Language model composition with ICE: A tutorial
 
 In this tutorial we'll learn how to get language models to do complex tasks by composing together multiple calls.
 
-We'll call programs that describe such compositions *recipes*.
-
+We'll call programs that describe such compositions _recipes_.
 
 ## The simplest recipe: Hello world!
 
@@ -50,10 +49,9 @@ Some things to note about the recipe:
 
 1. Add another method to `HelloWorld` and call it from `execute`. Does this show up in the trace?
 
-
 ## Calling an agent: Q&A
 
-Now let's make our first recipe that calls out to an agent. 
+Now let's make our first recipe that calls out to an agent.
 
 ```py
 from ice.recipe import Recipe
@@ -91,7 +89,6 @@ Things to note:
 ### Exercises
 
 1. Instead of answering directly, add "Let's think step by step" as a prefix to the answer part of the prompt.
-
 
 ## Composing calls to agents: Debate
 
@@ -145,7 +142,6 @@ You: "The war on drugs has been a failure. It's time to try something new."
 ```
 
 This will help us with prompts!
-
 
 ### From debates to prompts
 
@@ -207,21 +203,33 @@ class DebateRecipe(DynamicRecipe):
         return debate + [(agent_name, answer.strip())]
 ```
 
+Once you've saved the recipe in `debate.py` you can run it as usual:
+
+```sh
+scripts/run-recipe.sh debate -t -b -m machine
+```
+
 Some things to note:
 
 - In `agents = [self.agent(), self.agent()]` we're creating two agents. This doesn't actually matter since all the agents we're using in ICE right now don't have implicit state (except for humans), so we could just have created agents on the fly in the `turn` function.
-
 
 ### Exercises
 
 1. Add a judge agent at the end that decides which agent won the debate. In the original debate proposal, these judgments would be used to RL-finetune the parameters of the debate agents.
 
-
 ## Future topics
 
 - Reasoning about external content: Papers
+- Parts of recipes we've written
 - Subrecipes: Amplification
 - Agent methods: relevance etc
+- Better agents: OpenAIReasoning
+  - chain-of-thought + plurality voting
 - Special-purpose models & model hints
+- Filters & verifiers
 - Selection-Inference
 - Other structures from Cascades paper
+
+---
+
+[Edit on GitHub]({{ site.github.repository_url }}/edit/{{ site.github.source.branch }}/{{ site.github.source.path }})
