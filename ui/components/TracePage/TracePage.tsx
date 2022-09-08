@@ -73,7 +73,6 @@ const TreeContext = createContext<{
   setSelectedId: Dispatch<SetStateAction<string | undefined>>;
   getExpanded: (id: string) => boolean;
   setExpanded: (id: string, expanded: boolean) => void;
-  isLoading: boolean;
 } | null>(null);
 
 const applyUpdates = (calls: Calls, updates: Record<string, unknown>) =>
@@ -84,15 +83,17 @@ const TreeProvider = ({ traceId, children }: { traceId: string; children: ReactN
   const [calls, setCalls] = useState<Calls>({});
   const [selectedId, setSelectedId] = useState<string>();
   const [expandedById, setExpandedById] = useState<Record<string, boolean>>({});
-  const [isLoading, setIsLoading] = useState(true);
   const [autoselected, setAutoselected] = useState(false);
 
   useEffect(() => {
     if (!autoselected) {
       const firstRoot = Object.keys(calls[traceId]?.children ?? {})[0];
       if (firstRoot) {
-        setAutoselected(true);
-        setSelectedId(firstRoot);
+        const firstChild = Object.keys(calls[firstRoot]?.children ?? {})[0];
+        if (firstChild) {
+          setSelectedId(firstChild);
+          setAutoselected(true);
+        }
       }
     }
   }, [autoselected, calls, traceId]);
@@ -135,7 +136,6 @@ const TreeProvider = ({ traceId, children }: { traceId: string; children: ReactN
       } finally {
         if (mounted) {
           timeoutId = setTimeout(poll, delay);
-          setIsLoading(false); // set loading to false after first response
         }
       }
     };
@@ -158,7 +158,6 @@ const TreeProvider = ({ traceId, children }: { traceId: string; children: ReactN
         getExpanded: (id: string) => expandedById[id] ?? false,
         setExpanded: (id: string, expanded: boolean) =>
           setExpandedById(current => ({ ...current, [id]: expanded })),
-        isLoading,
       }}
     >
       {children}
@@ -173,8 +172,8 @@ const useTreeContext = () => {
 };
 
 const useCallInfo = (id: string) => {
-  const { calls, selectedId, setSelectedId, isLoading } = useTreeContext();
-  return { ...calls[id], selected: selectedId === id, select: () => setSelectedId(id), isLoading };
+  const { calls, selectedId, setSelectedId } = useTreeContext();
+  return { ...calls[id], selected: selectedId === id, select: () => setSelectedId(id) };
 };
 
 type SelectedCallInfo = {
@@ -213,7 +212,7 @@ const useLinks = () => {
   };
 
   const getChildren = (id: string) => {
-    const { children = {} } = calls[id];
+    const { children = {} } = calls[id] ?? {};
     return Object.keys(children);
   };
 
@@ -293,14 +292,10 @@ const Call = ({ id }: { id: string }) => {
 };
 
 const CallChildren = ({ id }: { id: string }) => {
-  const { children = {}, isLoading } = useCallInfo(id) ?? {};
+  const { children = {} } = useCallInfo(id) ?? {};
   const childIds = Object.keys(children);
 
-  return isLoading ? (
-    <div className="flex justify-center items-center h-full">
-      <Spinner size="medium" />
-    </div>
-  ) : (
+  return (
     <div className="flex flex-col">
       {childIds.map(id => (
         <Call key={id} id={id} />
@@ -580,11 +575,19 @@ const Trace = ({ traceId }: { traceId: string }) => {
 
   const [detailWidth, setDetailWidth] = useState(500);
 
+  const firstRoot = getChildren(traceId)[0];
+
   return (
     <div className="flex flex-col h-full min-h-screen">
       <div className="flex divide-x divide-gray-100 flex-1 overflow-clip">
         <div className="flex-1 p-6 overflow-y-auto flex-shrink-0">
-          <CallChildren id={traceId} />
+          {firstRoot ? (
+            <CallChildren id={firstRoot} />
+          ) : (
+            <div className="flex justify-center items-center h-full">
+              <Spinner size="medium" />
+            </div>
+          )}
         </div>
 
         <Separator detailWidth={detailWidth} setDetailWidth={setDetailWidth} />
