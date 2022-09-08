@@ -92,7 +92,7 @@ async def main(
 
     # Run recipe without paper arguments
     if not papers:
-        result = await recipe.execute(**args)
+        result = await recipe.execute(**args)  # type: ignore
         env().print(
             result,
             format_markdown=False,
@@ -170,7 +170,7 @@ async def run_recipe_over_papers(
 
     async def apply_recipe_to_paper(paper: Paper):
         execution_context.new_context(document_id=paper.document_id, task=str(recipe))
-        return await recipe.execute(paper=paper, **args)
+        return await recipe.execute(paper=paper, **args)  # type: ignore
 
     # Run recipe over papers
     max_concurrency = 5 if recipe.mode == "machine" else 1
