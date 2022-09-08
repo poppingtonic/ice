@@ -1,4 +1,4 @@
 ui/.next
 ui/client.d.ts
 ui/public/openapi.json
-_layouts/*.html
+docs/_layouts/*.html
