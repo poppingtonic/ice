@@ -43,7 +43,7 @@ A convenient way to develop ICE is to use GitHub codespaces.
    (cd ui; npm ci)
    ```
 
-1. Start ICE in its own terminal:
+1. Start ICE in its own terminal and leave it running:
 
    ```sh
    scripts/run-local.sh
@@ -76,7 +76,7 @@ A convenient way to develop ICE is to use GitHub codespaces.
    (cd ui; npm ci)
    ```
 
-1. Start ICE in its own terminal:
+1. Start ICE in its own terminal and leave it running:
 
    ```sh
    scripts/run-local.sh
