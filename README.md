@@ -49,9 +49,9 @@ A convenient way to develop ICE is to use GitHub codespaces.
    scripts/run-local.sh
    ```
 
-1. To share your visualizations publicly, on the ports pane (F1 to open the command palette -> "Ports: Focus on Ports View"), change port 3000 to be public (Right Click -> Port Visibility -> Public), and click the 🌐 icon in the "Local Address" field to get the link.
+1. Go through [the tutorial](https://oughtinc.github.io/ice9/) or follow the [instructions to running a recipe](#running-ice-on-the-command-line).
 
-1. Follow the [instructions to run a recipe](#running-ice-on-the-command-line).
+1. To share your visualizations publicly, on the ports pane (F1 to open the command palette -> "Ports: Focus on Ports View"), change port 3000 to be public (Right Click -> Port Visibility -> Public), and click the 🌐 icon in the "Local Address" field to get the link.
 
 ## Running ICE locally
 
@@ -82,7 +82,7 @@ A convenient way to develop ICE is to use GitHub codespaces.
    scripts/run-local.sh
    ```
 
-1. Follow the [instructions to run a recipe](#running-ice-on-the-command-line).
+1. Go through [the tutorial](https://oughtinc.github.io/ice9/) or follow the [instructions to running a recipe](#running-ice-on-the-command-line).
 
 ### Setup for Anthropic models
 
