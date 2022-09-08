@@ -60,6 +60,8 @@ class RankParagraphs(Recipe):
 
         num_estimated_comparisons = int(len(paragraphs) * math.log2(n))
         with tqdm(total=num_estimated_comparisons) as progress_bar:
-            ranked_paragraphs = await nsmallest_async(n, paragraphs, cmp)
+            ranked_paragraphs = await nsmallest_async(
+                n, paragraphs, cmp, self.max_concurrency()
+            )
 
         return ranked_paragraphs
