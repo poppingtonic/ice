@@ -1,6 +1,6 @@
 #! /usr/bin/env bash
 
-set -eux -o pipefail
+set -eu -o pipefail
 
 if docker compose -h >/dev/null; then
   docker="docker compose"

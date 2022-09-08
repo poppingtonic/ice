@@ -1,6 +1,6 @@
 #! /usr/bin/env bash
 
-set -eux -o pipefail
+set -eu -o pipefail
 
 START_FRONTEND=false ./scripts/run-local.sh
 

@@ -1,10 +1,7 @@
 import abc
-import contextlib
-import json
 import re
 import sys
 
-from asyncio import Future
 from contextvars import ContextVar
 from io import TextIOWrapper
 from typing import Any
@@ -22,13 +19,6 @@ from rich.panel import Panel
 from rich.pretty import pretty_repr
 from rich.table import Table
 from structlog import get_logger
-
-from ice.models import AnswerJob
-from ice.models import CheckboxesJob
-from ice.models import PrintJob
-from ice.models import ScoreJob
-from ice.models import SelectJob
-from ice.web import Session
 
 log = get_logger()
 
@@ -167,100 +157,6 @@ class CliEnvironment(EnvironmentInterface):
             print(question)
             raise ValueError("No score provided")
         return float(cast(str, score))
-
-
-class WebEnvironment(EnvironmentInterface):
-    def __init__(self, session: Session):
-        self.session = session
-
-    @contextlib.contextmanager
-    def spinner(self, message):
-        log.info("request spinner", message=message)
-
-        self.session.enqueue_job(
-            PrintJob(message=message),
-            Future(),
-        )
-        yield
-
-    def print(
-        self,
-        message: Any,
-        *,
-        format_markdown=False,
-        wait_for_confirmation=False,
-        file=None,
-    ):
-        log.info(
-            "request print",
-            message=message,
-            format_markdown=format_markdown,
-            wait_for_confirmation=wait_for_confirmation,
-        )
-
-        self.session.enqueue_job(
-            PrintJob(
-                message=message,
-                format_markdown=format_markdown,
-                wait_for_confirmation=wait_for_confirmation,
-            ),
-            Future(),
-        )
-
-    async def checkboxes(self, prompt: str, choices: list[str]):
-        log.info("request checkboxes", prompt=prompt, choices=choices)
-
-        get_answer: Future[str] = Future()
-        self.session.enqueue_job(
-            CheckboxesJob(prompt=prompt, choices=choices), future=get_answer
-        )
-
-        result = await get_answer
-        log.info("checkboxes selected", selection=result)
-        return result
-
-    async def answer(self, prompt: str, default: str, multiline: bool = False):
-        log.info("request answer", prompt=prompt, multiline=multiline)
-
-        get_answer: Future[str] = Future()
-        job = AnswerJob(prompt=prompt, default=default, multiline=multiline)
-        log.debug("enqueueing answer job", job=job)
-        self.session.enqueue_job(job, get_answer)
-
-        result = await get_answer
-        log.info("answer provided", job=job, answer=result)
-        return result
-
-    async def select(
-        self, prompt: str, choices: list[str], default: Optional[str] = None
-    ):
-        log.info("select", prompt=prompt, choices=choices)
-        get_answer: Future[str] = Future()
-        self.session.enqueue_job(
-            SelectJob(prompt=prompt, choices=choices), future=get_answer
-        )
-
-        result = await get_answer
-        selection = json.loads(result)
-        log.info("select returned", selection=selection)
-        return selection
-
-    async def score(
-        self, question: str, context: str, default: Optional[float]
-    ) -> float:
-        log.info("request score", question=question, context=context, default=default)
-
-        get_score: Future[float] = Future()
-        job = ScoreJob(
-            prompt=f"Score the relevance of Context:\n{context}\n\nto Question: {question}",
-            default=default,
-        )
-        log.debug("enqueueing score job", job=job)
-        self.session.enqueue_job(job, get_score)
-
-        result = await get_score
-        log.info("score provided", job=job, score=result)
-        return result
 
 
 _env = ContextVar("env", default=cast(EnvironmentInterface, CliEnvironment()))

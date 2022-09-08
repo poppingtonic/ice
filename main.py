@@ -8,12 +8,9 @@ import defopt
 
 from structlog.stdlib import get_logger
 
-from ice import database  # noqa: F401. Required to set up event subscriber.
 from ice import execution_context
 from ice.cli_utils import select_recipe_class
 from ice.environment import env
-from ice.environment import set_env
-from ice.environment import WebEnvironment
 from ice.evaluation.evaluate_recipe_result import RecipeResult
 from ice.metrics.gold_standards import retrieve_gold_standards_df
 from ice.mode import Mode
@@ -23,20 +20,14 @@ from ice.recipe import Recipe
 from ice.trace import enable_trace
 from ice.trace import trace
 from ice.utils import map_async
-from ice.web import Session
 
 
 log = get_logger()
 
 
-async def main_web(session: Session):
-    set_env(WebEnvironment(session))
-    return await main(mode="human")
-
-
 def main_cli(
     *,
-    mode: Mode = "augmented",
+    mode: Mode = "machine",
     output_file: str | None = None,
     json_out: str | None = None,
     recipe_name: str | None = None,
@@ -77,7 +68,7 @@ def main_cli(
 @trace
 async def main(
     *,
-    mode: Mode = "augmented",
+    mode: Mode = "machine",
     output_file: str | None = None,
     json_out: str | None = None,
     recipe_name: str | None = None,
@@ -91,11 +82,12 @@ async def main(
     # User selects papers
     papers = await get_papers(input_files, gold_standard_splits, question_short_name)
 
-    print(
-        f"Running recipe {recipe} over papers {', '.join(p.document_id for p in papers)}"
-    )
+    if papers:
+        print(
+            f"Running recipe {recipe} over papers {', '.join(p.document_id for p in papers)}"
+        )
 
-    # Run recipe
+    # Run recipe without paper arguments
     if not papers:
         result = await recipe.execute()
         env().print(
@@ -131,11 +123,8 @@ async def get_papers(
     """
     Get the list of papers based on the user input or selection.
     """
-    script_path = Path(__file__).parent
-    paper_dir = script_path / "papers/"
-
     if input_files is None:
-        paper_files = [f for f in paper_dir.iterdir() if f.suffix in (".pdf", ".txt")]
+        paper_files = []
     else:
         paper_files = [Path(i) for i in input_files]
 
@@ -157,14 +146,14 @@ async def get_papers(
             if f.name in question_gs_in_splits.document_id.unique()
         ]
 
-    if input_files is None and gold_standard_splits is None:
-        # If user doesn't specify anything about which papers to run over, select papers via CLI
-        paper_names = [f.name for f in paper_files]
-        selected_paper_names = await env().checkboxes("Papers", paper_names)
-        paper_files = [f for f in paper_files if f.name in selected_paper_names]
+    # If user doesn't specify papers via CLI args, we could prompt them
+    # but this makes it harder to run recipes that don't take papers as
+    # arguments, so we won't do that here.
 
-    if len(paper_files) == 0:
-        log.warning("No papers selected.")
+    # if input_files is None and gold_standard_splits is None:
+    #     paper_names = [f.name for f in paper_files]
+    #     selected_paper_names = await env().checkboxes("Papers", paper_names)
+    #     paper_files = [f for f in paper_files if f.name in selected_paper_names]
 
     return [Paper.load(f) for f in paper_files]
 
@@ -235,7 +224,9 @@ async def evaluate_results(
     recipe: Recipe, results_json: list[dict], output_file: str | None
 ):
     """
-    Evaluate the results using the recipe's evaluation report and dashboard row methods, and print the report to the output file or stdout.
+    Evaluate the results using the recipe's evaluation report and
+    dashboard row methods, and print the report to the output file or
+    stdout.
     """
     if recipe.results:
         evaluation_report = await recipe.evaluation_report()
