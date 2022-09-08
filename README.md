@@ -5,28 +5,19 @@ Decomposition of paper Q&A using humans and language models
 ## Table of contents
 
 - [Design principles](#design-principles)
-- [Developing ICE using GitHub codespaces]
+- [Running ICE with codespaces](#running-ice-with-codespaces)
 - [Running ICE locally](#running-ice-locally)
   - [Requirements](#requirements)
   - [Setup](#setup)
   - [Running ICE on the command line](#running-ice-on-the-command-line)
     - [Human data collection](#human-data-collection)
     - [GPT](#gpt)
-    - [Cheap tests](#cheap-tests)
   - [Streamlit](#streamlit)
   - [Evaluation](#evaluation)
   - [Evaluate in-app QA results](#evaluate-in-app-qa-results)
 - [Development](#development)
   - [Adding new Python dependencies](#adding-new-python-dependencies)
-  - [Changing the database schema](#changing-the-database-schema)
-  - [Regenerating the TypeScript definitions](#regenerating-the-typescript-definitions)
   - [Contributions](#contributions)
-- [Web app deployment](#web-app-deployment)
-  - [Running the web app locally](#running-the-web-app-locally)
-  - [Running previews of the app for PRs](#running-previews-of-the-app-for-prs)
-  - [Running the web app in production](#running-the-web-app-in-production)
-  - [Connecting to the database](#connecting-to-the-database)
-    - [Navigating the database](#navigating-the-database)
 
 ## Design principles
 
@@ -40,7 +31,7 @@ Decomposition of paper Q&A using humans and language models
 
 - The **mode** in which a recipe runs is a global setting that can affect every agent call. For instance, whether to use humans or agents. Recipes can also run with certain `RecipeSettings`, which can map a task type to a specific `agent_name`, which can modify which agent is used for that specfic type of task.
 
-## Developing ICE using GitHub Codespaces
+## Running ICE with Codespaces
 
 A convenient way to develop ICE is to use GitHub codespaces.
 
