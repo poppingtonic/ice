@@ -125,28 +125,28 @@ async def get_papers(
     """
     Get the list of papers based on the user input or selection.
     """
-    if input_files is None:
-        paper_files = []
-    else:
-        paper_files = [Path(i) for i in input_files]
-
     if (gold_standard_splits is None) != (question_short_name is None):
         raise ValueError(
             "Must specify both gold_standard_splits and question_short_name or neither."
         )
 
-    if gold_standard_splits is not None:
+    if input_files:
+        paper_files = [Path(i) for i in input_files]
+    elif gold_standard_splits:
         gs_df = retrieve_gold_standards_df()
         question_gs_in_splits = gs_df[
             (gs_df.question_short_name == question_short_name)
             & (gs_df.split.isin(gold_standard_splits))
             & (gs_df["Are quotes enough?"] != "No")
         ]
+        paper_dir = Path(__file__).parent / "papers/"
         paper_files = [
             f
-            for f in paper_files
+            for f in paper_dir.iterdir()
             if f.name in question_gs_in_splits.document_id.unique()
         ]
+    else:
+        paper_files = []
 
     # If user doesn't specify papers via CLI args, we could prompt them
     # but this makes it harder to run recipes that don't take papers as
