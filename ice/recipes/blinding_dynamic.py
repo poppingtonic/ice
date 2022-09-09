@@ -343,12 +343,10 @@ class BlindingDynamic(Recipe):
             results_by_group[group] = comparison
         return results_by_group
 
-    async def execute(self, **kw):
+    async def run(self, paper: Paper):
         """
         For each intervention, summarize how it was blinded.
         """
-        paper: Paper = kw["paper"]
-        # question: str = kw["question"]
         results_by_intervention: dict[str, dict[Group, dict[str, Any]]] = {}
         interventions = await self.interventions(paper)
         for intervention in interventions:

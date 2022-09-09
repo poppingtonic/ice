@@ -815,7 +815,7 @@ class AdherenceParagraphTfew(Recipe):
         for prompt, choice_inputs in make_multiple_adherence_prompts(
             context=context, section=section, sentence=sentence
         ):
-            choice, _, _ = await self.agent(self.s.qa_model).prompted_classify(
+            choice, _, _ = await self.agent(self.s.qa_model).classify(
                 context=prompt, question="", choices=choice_inputs
             )
             if choice == choice_inputs[1]:
@@ -1028,9 +1028,7 @@ class AdherenceParagraphTfew(Recipe):
             document_id=document_id, question_short_name=question_short_name
         )
 
-    async def execute(self, **kwargs):
-        paper: Paper = kwargs["paper"]
-
+    async def run(self, paper: Paper):
         results = []
 
         for intervention in await self.list_experiments(paper.document_id):

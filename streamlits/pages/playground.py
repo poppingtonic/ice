@@ -59,7 +59,7 @@ def select_agent_params(agent_class):
 
 
 def select_agent_method():
-    agent_methods = ["answer", "relevance", "predict", "prompted_classify"]
+    agent_methods = ["answer", "relevance", "predict", "classify"]
     agent_method = st.selectbox("Select agent method", agent_methods)
     return agent_method
 

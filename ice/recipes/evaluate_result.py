@@ -141,20 +141,21 @@ class ResultComparison(BaseModel):
 
 
 class EvaluateResult(Recipe):
-    async def execute(self, **kw) -> ResultComparison:
-
-        model_result: str
-        gold_result: str
-        question: str
+    async def run(
+        self,
+        model_result: str | None = None,
+        gold_result: str | None = None,
+        question: str | None = None,
+    ) -> ResultComparison:
 
         if self.mode == "test":
             model_results, gold_results, question = self.test_data()
             model_result = model_results[0]
             gold_result = gold_results[0]
         else:
-            model_result = kw["model_result"]
-            gold_result = kw["gold_result"]
-            question = kw["question"]
+            assert model_result is not None
+            assert gold_result is not None
+            assert question is not None
 
         missing_info_prompt = make_compare_results_prompt(
             question=question, model_result=model_result, gold_result=gold_result
@@ -171,7 +172,7 @@ class EvaluateResult(Recipe):
             model_result=model_result,
             gold_result=gold_result,
         )
-        choice, score, _ = await self.agent("instruct").prompted_classify(
+        choice, score, _ = await self.agent("instruct").classify(
             context="", question=classification_prompt, choices=(" Yes", " No")
         )
 

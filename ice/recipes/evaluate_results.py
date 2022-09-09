@@ -9,28 +9,27 @@ log = get_logger()
 
 
 class EvaluateResults(Recipe):
-    async def execute(self, **kw) -> list[ResultComparison]:
+    async def run(
+        self,
+        question: str | None = None,
+        model_results: list[str] | None = None,
+        gold_results: list[str] | None = None,
+    ) -> list[ResultComparison]:
         """
         Compare two lists of results, model and gold standard.
         """
-        model_results: list[str]
-        gold_results: list[str]
-        question: str
-
         evaluate_result = EvaluateResult(mode=self.mode)
 
-        if not kw.get("model_results") and not kw.get("gold_results"):
+        if not model_results and not gold_results and not question:
             if not self.mode == "test":
                 log.warning("No model results and no gold results - using test data.")
             model_results, gold_results, question = evaluate_result.test_data(n=3)
-        else:
-            model_results = kw["model_results"]
-            gold_results = kw["gold_results"]
-            question = kw["question"]
+        elif not model_results or not gold_results or not question:
+            raise ValueError("Must provide both model results and gold results.")
 
         comparisons = await map_async(
             list(zip(model_results, gold_results)),
-            lambda pair: evaluate_result.execute(
+            lambda pair: evaluate_result.run(
                 question=question, model_result=pair[0], gold_result=pair[1]
             ),
             max_concurrency=self.max_concurrency(),

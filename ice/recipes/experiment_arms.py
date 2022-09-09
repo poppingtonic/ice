@@ -13,7 +13,7 @@ log = get_logger()
 class ExperimentArms(Recipe):
     async def get_arms(self, paper: Paper) -> list[Experiment]:
         qa_recipe = ComparisonsQA(mode=self.mode)
-        arms_result = await qa_recipe.execute(
+        arms_result = await qa_recipe.run(
             paper=paper,
             question_short="""What were the trial arms (subgroups of participants) of the experiment?""",
             question_long="""What were the trial arms (subgroups of participants) of the experiment? List one per line.""",
@@ -27,7 +27,7 @@ class ExperimentArms(Recipe):
     ) -> str:
         qa_recipe = ComparisonsQA(mode=self.mode)
         if len(arms) == 1:
-            qa_result = await qa_recipe.execute(
+            qa_result = await qa_recipe.run(
                 paper=paper,
                 question_short=f"""What was the setup of the "{arm_to_describe}" trial arm?""",
                 question_long=f"""What was the setup of the "{arm_to_describe}" trial arm? Describe the intervention in a few sentences.""",
@@ -36,7 +36,7 @@ class ExperimentArms(Recipe):
             )
         else:
             arm_strings = ", ".join(arms)
-            qa_result = await qa_recipe.execute(
+            qa_result = await qa_recipe.run(
                 paper=paper,
                 question_short=f"""What was the setup of the "{arm_to_describe}" trial arm?""",
                 question_long=f"""In the study there were {len(arms)} trial arms, {arm_strings}. What was the setup of the "{arm_to_describe}" trial arm? Describe the intervention in a few sentences.""",
@@ -55,9 +55,7 @@ class ExperimentArms(Recipe):
         )
         return arm_descriptions
 
-    async def execute(self, **kw):
-        paper: Paper = kw["paper"]
-
+    async def run(self, paper: Paper):
         arms = await self.get_arms(paper)
 
         arm_descriptions = await self.get_arm_descriptions(paper, arms)

@@ -25,16 +25,19 @@ def load_recipe_class_from_file(filename: str) -> Type[Recipe]:
     if loader is None:
         raise ValueError(f"Could not load recipe from file {filename}")
     loader.exec_module(module)
-    # Find the first subclass of Recipe in the module
-    for obj in vars(module).values():
+    # Find the last subclass of Recipe in the module
+    recipe_class = None
+    for name, obj in vars(module).items():
         try:
             if issubclass(obj, Recipe) and obj is not Recipe:
-                return obj
+                recipe_class = obj
         except TypeError:
             # obj is not a class, skip it
             continue
     # Raise an exception if no recipe class is found
-    raise ValueError(f"No recipe class found in {filename}")
+    if recipe_class is None:
+        raise ValueError(f"No recipe class found in {filename}")
+    return recipe_class
 
 
 def load_recipe_class_by_name(recipe_name: str) -> Type[Recipe]:

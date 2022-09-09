@@ -57,7 +57,7 @@ class AugmentedAgent(Agent):
         )
         return human_resp
 
-    async def prompted_classify(
+    async def classify(
         self,
         *,
         context: str = "",
@@ -66,11 +66,7 @@ class AugmentedAgent(Agent):
         default: str | None = None,
         verbose: bool = False,
     ) -> tuple[str, float, str | None]:
-        (
-            machine_choice,
-            machine_prob,
-            explanation,
-        ) = await self.machine.prompted_classify(
+        (machine_choice, machine_prob, explanation,) = await self.machine.classify(
             context=context,
             question=question,
             choices=choices,
@@ -82,7 +78,7 @@ class AugmentedAgent(Agent):
             #       not circumvent agent abstraction
             env().print(
                 f"""
-#### prompted_classify
+#### classify
 
 Machine choice:
 
@@ -97,7 +93,7 @@ Explanation for machine choice:
 {quoted(explanation)}""",
                 format_markdown=True,
             )
-        return await self.human.prompted_classify(
+        return await self.human.classify(
             context=context,
             question=question,
             choices=choices,

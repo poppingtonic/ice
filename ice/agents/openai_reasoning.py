@@ -45,7 +45,7 @@ class OpenAIReasoningAgent(Agent):
         # TODO: implement this method
         raise NotImplementedError
 
-    async def prompted_classify(
+    async def classify(
         self,
         *,
         context: str = "",

@@ -70,7 +70,7 @@ class PlaceboDescription(Recipe):
         )
 
         # Save to trace
-        evaluation = await EvaluateResult(mode=self.mode).execute(
+        evaluation = await EvaluateResult(mode=self.mode).run(
             gold_result=get_gold_placebo(paper.document_id, experiment),
             model_result=placebo_description,
             question=f'What was the placebo for the "{experiment}" experiment?',
@@ -79,9 +79,7 @@ class PlaceboDescription(Recipe):
 
         return placebo_description
 
-    async def execute(self, record=recorder, **kw):
-        paper: Paper = kw["paper"]
-
+    async def run(self, paper: Paper, record=recorder):
         # Get the list of experiments (for now from gold standards)
         experiments = await self.get_gold_experiments(paper)
 

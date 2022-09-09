@@ -24,7 +24,7 @@ class TFew(Agent):
             batch_interval_seconds=batch_interval_seconds,
         )
 
-    async def prompted_classify(
+    async def classify(
         self,
         *,
         context: str = "",

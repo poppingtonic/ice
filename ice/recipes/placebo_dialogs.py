@@ -442,8 +442,7 @@ class PlaceboDialogs(Recipe):
             },
         }
 
-    async def execute(self, **kw):
-        paper: Paper = kw["paper"]
+    async def run(self, paper: Paper):
         experiments = list_experiments(
             document_id=get_full_document_id(paper.document_id)
         )
