@@ -15,7 +15,7 @@ Answer:"""
 class PaperQA(Recipe):
     async def classify_paragraph(self, paragraph: Paragraph, question: str) -> float:
         choice, choice_prob, _ = await self.agent().classify(
-            question=make_classification_prompt(paragraph, question),
+            prompt=make_classification_prompt(paragraph, question),
             choices=(" Yes", " No"),
         )
         return choice_prob if choice == " Yes" else 1 - choice_prob

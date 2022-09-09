@@ -27,13 +27,12 @@ class TFew(Agent):
     async def classify(
         self,
         *,
-        context: str = "",
-        question: str,
+        prompt: str,
         choices: tuple[str, ...],
         default: str | None = None,
         verbose: bool = False
     ) -> tuple[str, float, str | None]:
-        inp = PromptedClassificationInput(prompt=context + question, choices=choices)
+        inp = PromptedClassificationInput(prompt=prompt, choices=choices)
 
         def run_batch() -> PromptedClassificationOutput:
             return self.batcher.process(arg=inp)

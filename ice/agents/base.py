@@ -7,8 +7,8 @@ class Agent(TracedABC):
     async def relevance(
         self,
         *,
-        question: str,
         context: str,
+        question: str,
         verbose: bool = False,
         default: float | None = None,
     ) -> float:
@@ -17,8 +17,7 @@ class Agent(TracedABC):
     async def answer(
         self,
         *,
-        context: str = "",
-        question: str,
+        prompt: str,
         multiline: bool = False,
         verbose: bool = False,
         default: str = "",
@@ -34,8 +33,7 @@ class Agent(TracedABC):
     async def classify(
         self,
         *,
-        context: str = "",
-        question: str,
+        prompt: str,
         choices: tuple[str, ...],
         default: str | None = None,
         verbose: bool = False,

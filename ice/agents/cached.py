@@ -18,20 +18,18 @@ class CachedAgent(Agent):
     async def answer(
         self,
         *,
-        context="",
-        question,
+        prompt,
         multiline=False,
         verbose=False,
         default="",
         max_tokens: int | None = None,
     ) -> str:
-        prompt = context + question  # TODO: add multiline and max_tokens to the prompt
+        # TODO: add multiline and max_tokens to the prompt
         key = get_cache_key("answer", prompt)
         if key in self.cache:
             return self.cache[key]
         answer = await self.base_agent.answer(
-            context=context,
-            question=question,
+            prompt=prompt,
             multiline=multiline,
             verbose=verbose,
             default=default,
@@ -53,18 +51,16 @@ class CachedAgent(Agent):
     async def classify(
         self,
         *,
-        context: str = "",
-        question: str,
+        prompt: str,
         choices: tuple[str, ...],
         default: str | None = None,
         verbose: bool = False,
     ) -> tuple[str, float, str | None]:
-        prompt = context + question
         key = get_cache_key("classify", prompt)
         if key in self.cache:
             return self.cache[key]
         classification = await self.base_agent.classify(
-            context=context, question=question, choices=choices, verbose=verbose
+            prompt=prompt, choices=choices, verbose=verbose
         )
         self.cache[key] = classification
         return classification

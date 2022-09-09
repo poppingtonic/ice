@@ -22,24 +22,21 @@ class AugmentedAgent(Agent):
     async def answer(
         self,
         *,
-        context="",
-        question,
-        multiline=False,
-        verbose=False,
-        default="",
+        prompt: str,
+        multiline: bool = False,
+        verbose: bool = False,
+        default: str = "",
         max_tokens: int | None = None,
     ):
         machine_resp = await self.machine.answer(
-            context=context,
-            question=question,
+            prompt=prompt,
             multiline=multiline,
             verbose=verbose,
             default=default,
             max_tokens=max_tokens,
         )
         return await self.human.answer(
-            context=context,
-            question=question,
+            prompt=prompt,
             multiline=multiline,
             verbose=verbose,
             default=machine_resp,
@@ -60,15 +57,13 @@ class AugmentedAgent(Agent):
     async def classify(
         self,
         *,
-        context: str = "",
-        question: str,
+        prompt: str,
         choices: tuple[str, ...],
         default: str | None = None,
         verbose: bool = False,
     ) -> tuple[str, float, str | None]:
         (machine_choice, machine_prob, explanation,) = await self.machine.classify(
-            context=context,
-            question=question,
+            prompt=prompt,
             choices=choices,
             default=default,
             verbose=verbose,
@@ -94,8 +89,7 @@ Explanation for machine choice:
                 format_markdown=True,
             )
         return await self.human.classify(
-            context=context,
-            question=question,
+            prompt=prompt,
             choices=choices,
             default=machine_choice,
             verbose=verbose,

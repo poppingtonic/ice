@@ -161,8 +161,7 @@ class EvaluateResult(Recipe):
             question=question, model_result=model_result, gold_result=gold_result
         )
         missing_info = await self.agent().answer(
-            context="",
-            question=missing_info_prompt,
+            prompt=missing_info_prompt,
             multiline=True,
             max_tokens=200,
         )
@@ -173,7 +172,7 @@ class EvaluateResult(Recipe):
             gold_result=gold_result,
         )
         choice, score, _ = await self.agent("instruct").classify(
-            context="", question=classification_prompt, choices=(" Yes", " No")
+            prompt=classification_prompt, choices=(" Yes", " No")
         )
 
         choice = choice.strip()

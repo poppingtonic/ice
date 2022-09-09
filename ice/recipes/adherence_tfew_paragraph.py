@@ -816,7 +816,7 @@ class AdherenceParagraphTfew(Recipe):
             context=context, section=section, sentence=sentence
         ):
             choice, _, _ = await self.agent(self.s.qa_model).classify(
-                context=prompt, question="", choices=choice_inputs
+                prompt=prompt, choices=choice_inputs
             )
             if choice == choice_inputs[1]:
                 return True

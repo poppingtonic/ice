@@ -57,8 +57,7 @@ class DialogState(BaseModel):
 
     async def ask(self, question: str, multiline=True, answer_prefix=""):
         partial_answer = await self.agent.answer(
-            context=f"{self.context}\n\n",
-            question=f"Q: {question}\n\nA: {answer_prefix}",
+            prompt=f"{self.context}\n\nQ: {question}\n\nA: {answer_prefix}",
             multiline=multiline,
         )
         answer = f"{answer_prefix} {partial_answer}".strip()
@@ -357,8 +356,7 @@ class PlaceboDialogs(Recipe):
         prompt = make_placebo_kind_aggregation_prompt(experiment, quotes, answers)
 
         answer_completion = await self.agent().answer(
-            context="",
-            question=prompt,
+            prompt=prompt,
             multiline=True,
         )
         answer = f"The placebo was {answer_completion}"

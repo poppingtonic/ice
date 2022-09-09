@@ -32,8 +32,7 @@ class OpenAIAgent(Agent):
     async def answer(
         self,
         *,
-        context: str = "",
-        question: str,
+        prompt: str,
         multiline: bool = False,
         verbose: bool = False,
         default: str = "",
@@ -41,11 +40,9 @@ class OpenAIAgent(Agent):
     ) -> str:
         """Generate an answer to a question given some context."""
         if verbose:
-            self._print_markdown(question)
+            self._print_markdown(prompt)
         stop = None if multiline else "\n"
-        response = await self._complete(
-            context + question, stop=stop, max_tokens=max_tokens
-        )
+        response = await self._complete(prompt, stop=stop, max_tokens=max_tokens)
         answer = self._extract_answer(response)
         if verbose:
             self._print_markdown(answer)
@@ -64,15 +61,12 @@ class OpenAIAgent(Agent):
     async def classify(
         self,
         *,
-        context: str = "",
-        question: str,
+        prompt: str,
         choices: tuple[str, ...],
         default: str | None = None,
         verbose: bool = False,
     ) -> tuple[str, float, str | None]:
         """Generate a classification from a list of choices given some context and a question."""
-        prompt = context + question
-
         if verbose:
             self._print_markdown(prompt)
             self._print_markdown(choices)

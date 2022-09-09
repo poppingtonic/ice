@@ -64,8 +64,7 @@ class FunnelSimple(Recipe):
                 "anthropic-junior-h-helpful-v7-s750"
                 # "text-alpha"
             ).answer(
-                context="",
-                question=generate_qa_prompt_instruct(chunk),
+                prompt=generate_qa_prompt_instruct(chunk),
                 multiline=True,
                 max_tokens=500,
             )

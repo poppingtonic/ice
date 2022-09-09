@@ -31,16 +31,14 @@ class AnthropicAgent(Agent):
     async def answer(
         self,
         *,
-        context: str = "",
-        question: str,
+        prompt: str,
         multiline: bool = False,
         verbose: bool = False,
         default: str = "",
         max_tokens: int | None = None,
     ) -> str:
         if verbose:
-            env().print(question, format_markdown=True)
-        prompt = context + question
+            env().print(prompt, format_markdown=True)
         self.validate_prompt(prompt)
         answer = await self.client.complete(
             prompt,
