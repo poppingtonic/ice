@@ -553,7 +553,7 @@ Take a look at the trace to see how it all fits together.
 3. (Advanced) Implement debate with agents that have access to the same paper, and let agents provide quotes from the paper that can't be faked. Does being able to refer to ground truth quotes favor truth in debate?
 
 
-## Amplification: Recursive question-answering
+## Recursive question-answering: Amplification
 
 Amplification is the idea that agents can make subcalls to copies of themselves to inform how to answer a question or make a decision.
 
@@ -566,7 +566,7 @@ from ice.recipe import Recipe
 
 
 def make_subquestion_prompt(question: str) -> str:
-    return f"""Decompose the following question into 2-5 subquestions that would help you answer the question.
+    return f"""Decompose the following question into 2-5 subquestions that would help you answer the question. Make the questions stand alone, so that they can be answered without the context of the original question.
 
 Question: "{question}"
 Subquestions:
@@ -670,7 +670,9 @@ If we run this, we get back a list of subquestions and their answers:
 We need an equivalent of `make_qa_prompt` that optionally takes a list of subquestions and answers and provides those in the prompt. Let's introduce a type `Subs` for pairs of questions and answers and extend `make_qa_prompt` to use it if given:
 
 ```py
-Subs = list[tuple[str, str]]
+Question = str
+Answer = str
+Subs = list[tuple[Question, Answer]]
 
 
 def render_background(subs: Subs) -> str:
@@ -714,16 +716,19 @@ With this in hand, we can write the one-step amplified Q&A recipe:
 
 ```py
 class AmplifiedQA(Recipe):
+    async def run(self, question: str = "What is the effect of creatine on cognition?"):
+        subs = await self.get_subs(question)
+        answer = await self.answer(question=question, subs=subs)
+        return answer
+
+    async def get_subs(self, question: str) -> Subs:
+        subquestions = await Subquestions().run(question=question)
+        subanswers = await map_async(subquestions, self.answer)
+        return list(zip(subquestions, subanswers))
+
     async def answer(self, question: str, subs: Subs = []) -> str:
         prompt = make_qa_prompt(question, subs=subs)
         answer = (await self.agent().answer(prompt=prompt, max_tokens=100)).strip('" ')
-        return answer
-
-    async def run(self, question: str = "What is the effect of creatine on cognition?"):
-        subquestions = await Subquestions().run(question=question)
-        subanswers = await map_async(subquestions, self.answer)
-        subs = list(zip(subquestions, subanswers))
-        answer = await self.answer(question=question, subs=subs)
         return answer
 ```
 
@@ -745,11 +750,68 @@ Compare with the unamplified answer:
 Creatine has been shown to improve cognition in people with Alzheimer's disease and other forms of dementia.
 ```
 
+### Recursive amplification
+
+Now we'd like to generalize the recipe above so that we can run it at different depths:
+
+- Depth 0: Just answer the question, no subquestions
+- Depth 1: One layer of subquestions
+- Depth 2: Use subquestions when answering subquestions
+- Etc.
+
+To do this, we adda `depth` parameter to `run` and `get_subs` and only get subquestions if we're at depth > 0. This simplifies the amplification recipe to:
+
+```py
+class AmplifiedQA(Recipe):
+    async def run(self, question: str = "What is the effect of creatine on cognition?", depth: int = 1):
+        subs = await self.get_subs(question, depth - 1) if depth > 0 else []
+        prompt = make_qa_prompt(question, subs=subs)
+        answer = (await self.agent().answer(prompt=prompt, max_tokens=100)).strip('" ')
+        return answer
+
+    async def get_subs(self, question: str, depth: int) -> Subs:
+        subquestions = await Subquestions().run(question=question)
+        subanswers = await map_async(subquestions, lambda q: self.run(q, depth))
+        return list(zip(subquestions, subanswers))
+```
+
+Now we have a parameterized recipe that we can run at different depths:
+
+```sh
+scripts/run-recipe.sh -r amplification.py -t --args '{"depth": 0}'
+```
+
+```
+Creatine has been shown to improve cognition in people with Alzheimer's disease and other forms of dementia.
+```
+
+```sh
+scripts/run-recipe.sh -r amplification.py -t --args '{"depth": 1}'
+```
+
+```
+The effect of creatine on cognition is mixed. Some studies have found that creatine can help improve memory and reaction time, while other studies have found no significant effects. It is possible that the effects of creatine on cognition may vary depending on the individual.
+```
+
+```sh
+scripts/run-recipe.sh -r amplification.py -t --args '{"depth": 2}'
+```
+
+```
+The effect of creatine on cognition is inconclusive. Some studies have found that creatine can improve cognitive function in healthy adults, while other studies have found no significant effects. More research is needed to determine the potential cognitive benefits of creatine.
+```
+
+
+### Exercises
+
+1. Right now we're answering subquestions without the context of the question they're intended to help with. Provide the question (or questions) that are further up in the hierarchy as additional context to the model.
+2. Running subquestions in parallel is nice because it's fast, but has the disadvantage that the answers to later subquestions can't inform what question to ask next. Modify the recipe to support sequential choice of questions based on earlier responses.
+3. Now make the recipe from step 1 adaptive: Let the model decide whether to answer or whether to ask another subquestion. If you don't limit the depth, what is the effective depth that the model ends up for different questions?
+
+
 ## Future tutorial topics
 
-- Recursive amplification: Fold/unfold structure
 - Other recipe components we've written, e.g. paragraph ranking
-- Amplification
 - Agent methods: Relevance etc
 - Agent combinators
   - Machine agent with human spot checking
