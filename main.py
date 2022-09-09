@@ -35,7 +35,6 @@ def main_cli(
     gold_standard_splits: list[str] | None = None,
     question_short_name: str | None = None,
     trace: bool = False,
-    browser: bool = False,
     args: dict | None = None,
 ):
     """
@@ -49,7 +48,7 @@ def main_cli(
     :param gold_standard_splits: "iterate", "validation", and/or "test"
     """
     if trace:
-        enable_trace(browser)
+        enable_trace()
 
     async def main_wrapper():
         # A traced function cannot be called until the event loop is running.
