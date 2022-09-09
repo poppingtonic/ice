@@ -11,23 +11,18 @@ from structlog.stdlib import get_logger
 from transformers.models.auto.tokenization_auto import AutoTokenizer
 from transformers.models.gpt2.tokenization_gpt2_fast import GPT2TokenizerFast
 
-from ice.apis.openai import OpenAIAPIClient
+from ice.apis.openai import openai_complete
 from ice.evaluation.evaluate_recipe_result import RecipeResult
 from ice.metrics.gold_standards import list_experiments
 from ice.paper import Paper
 from ice.paper import Paragraph
 from ice.paper import split_sentences
 from ice.recipe import Recipe
-from ice.settings import settings
 from ice.utils import filter_async
 from ice.utils import map_async
 
 from ..trace import recorder
 from ..trace import trace
-
-openai_client = OpenAIAPIClient(
-    api_key=settings.OPENAI_API_KEY, org_id=settings.OPENAI_ORG_ID
-)
 
 
 gpt2_tokenizer: GPT2TokenizerFast = AutoTokenizer.from_pretrained("gpt2")
@@ -296,7 +291,7 @@ Here's all the the information in this paper about adherence, attrition, and com
 async def complete_with_cache_buster(
     prompt: str, temperature: float, max_tokens: int, top_p: float, stop, cache_id: int
 ):
-    return await openai_client.complete(
+    return await openai_complete(
         stop=stop,
         prompt=prompt,
         temperature=temperature,
@@ -572,7 +567,7 @@ async def intervention_classification_answer_with_reasoning(
     "Does this paragraph contain information about adherence, compliance, or attrition?"
     """
     cache_id  # unused
-    response = await openai_client.complete(
+    response = await openai_complete(
         prompt=intervention_classification_prompt(paragraph, intervention),
         temperature=temperature,
         max_tokens=657,
@@ -615,7 +610,7 @@ async def this_or_other_classification_answer_with_reasoning(
     asking, "Is this paragraph about adherence about a related work or
     the study this paper is reporting on?"
     """
-    response = await openai_client.complete(
+    response = await openai_complete(
         prompt=this_or_other_study_prompt(paragraph, intervention),
         temperature=temperature,
         max_tokens=768,
@@ -681,7 +676,7 @@ Conclusion: """.strip()
 async def zero_temp_final_classification(prompt: str):
     """Perform a final classification step using a reasoning
     selected from the sampled classifications."""
-    return await openai_client.complete(
+    return await openai_complete(
         prompt=prompt,
         stop=("\n"),
     )

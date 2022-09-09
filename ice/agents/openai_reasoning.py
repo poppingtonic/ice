@@ -3,8 +3,7 @@ from collections import Counter
 from structlog.stdlib import get_logger
 
 from ice.agents.base import Agent
-from ice.apis.openai import OpenAIAPIClient
-from ice.settings import settings
+from ice.apis.openai import openai_complete
 
 log = get_logger()
 
@@ -23,10 +22,6 @@ class OpenAIReasoningAgent(Agent):
         self.num_workers = num_workers
         self.answer_prefix = "Answer:"
         self.reasoning_prefix = "Reasoning:"
-        self.client = OpenAIAPIClient(
-            api_key=settings.OPENAI_API_KEY,
-            org_id=settings.OPENAI_ORG_ID,
-        )
 
     async def answer(
         self,
@@ -86,7 +81,7 @@ class OpenAIReasoningAgent(Agent):
         )
 
         # Request multiple completions from the API
-        response = await self.client.complete(
+        response = await openai_complete(
             prompt,
             stop=None,
             model=self.model,
@@ -127,7 +122,7 @@ class OpenAIReasoningAgent(Agent):
         followup_prompt = f"{prompt}{response_text}\n\n{self.answer_prefix}"
 
         # Request a single completion from the API
-        followup_response = await self.client.complete(
+        followup_response = await openai_complete(
             followup_prompt,
             stop=None,
             model=self.model,
