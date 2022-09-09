@@ -61,15 +61,12 @@ class OpenAIAgent(Agent):
     async def classify(
         self,
         *,
-        context: str = "",
-        question: str,
+        prompt: str,
         choices: tuple[str, ...],
         default: str | None = None,
         verbose: bool = False,
     ) -> tuple[str, float, str | None]:
         """Generate a classification from a list of choices given some context and a question."""
-        prompt = context + question
-
         if verbose:
             self._print_markdown(prompt)
             self._print_markdown(choices)

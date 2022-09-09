@@ -47,29 +47,27 @@ class OpenAIReasoningAgent(Agent):
     async def classify(
         self,
         *,
-        context: str = "",
-        question: str,
+        prompt: str,
         choices: tuple[str, ...],
         default: str | None = None,
         verbose: bool = False,
     ) -> tuple[str, float, str | None]:
         # Generate the prompt for the reasoning task
-        prompt = self._generate_reasoning_prompt(context, question)
+        reasoning_prompt = self._generate_reasoning_prompt(prompt)
 
         # Request multiple completions from the API
-        response = await self._request_completions(prompt)
+        response = await self._request_completions(reasoning_prompt)
 
         # Parse the responses and aggregate the answers and reasonings
         answers, reasonings = await self._parse_and_aggregate_responses(
-            prompt, response
+            reasoning_prompt, response
         )
 
         # Return the most common answer, its probability, and the joined reasonings
         return self._format_result(answers, reasonings)
 
-    def _generate_reasoning_prompt(self, context: str, question: str) -> str:
+    def _generate_reasoning_prompt(self, prompt: str) -> str:
         # Check that the prompt ends with the answer prefix
-        prompt = context + question
         if not prompt.endswith(self.answer_prefix):
             msg = f"Prompt doesn't end with {self.answer_prefix}"
             log.warning(msg, prompt=prompt)

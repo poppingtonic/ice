@@ -33,13 +33,12 @@ class HumanAgent(Agent):
     async def classify(
         self,
         *,
-        context: str = "",
-        question: str,
+        prompt: str,
         choices: tuple[str, ...],
         default: str | None = None,
         verbose: bool = False,
     ) -> tuple[str, float, str | None]:
         choice = await env().select(
-            prompt=context + question, choices=list(choices), default=default
+            prompt=prompt, choices=list(choices), default=default
         )
         return choice, 1.0, None

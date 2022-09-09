@@ -536,8 +536,7 @@ Answer:"""
         answer, probability, explanations = await self.agent(
             agent_name="instruct-reasoning-crowd"
         ).classify(
-            context="",
-            question=prompt,
+            prompt=prompt,
             choices=tuple(choices),
             verbose=verbose,
         )

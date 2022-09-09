@@ -340,7 +340,7 @@ In this recipe we'll take a simple approach:
 
 #### Classifying individual paragraphs using `classify`
 
-Let's start by just classifying whether the first paragraph answers a question. To do this, we'll use a new agent method, `classify`. It takes a context, a question, and a list of choices, and returns a choice, a choice probability, and for some agent implementations an explanation.
+Let's start by just classifying whether the first paragraph answers a question. To do this, we'll use a new agent method, `classify`. It takes a prompt and a list of choices, and returns a choice, a choice probability, and for some agent implementations an explanation.
 
 Our single-paragraph classifier looks like this:
 
@@ -359,7 +359,7 @@ class PaperQA(Recipe):
 
     async def classify_paragraph(self, paragraph: Paragraph, question: str) -> float:
         choice, choice_prob, _ = await self.agent().classify(
-            question=make_prompt(paragraph, question),
+            prompt=make_prompt(paragraph, question),
             choices=(" Yes", " No"),
         )
         return choice_prob if choice == " Yes" else 1 - choice_prob
@@ -405,7 +405,7 @@ class PaperQA(Recipe):
 
     async def classify_paragraph(self, paragraph: Paragraph, question: str) -> float:
         choice, choice_prob, _ = await self.agent().classify(
-            question=make_prompt(paragraph, question),
+            prompt=make_prompt(paragraph, question),
             choices=(" Yes", " No"),
         )
         return choice_prob if choice == " Yes" else 1 - choice_prob
@@ -456,7 +456,7 @@ Answer:"""
 class PaperQA(Recipe):
     async def classify_paragraph(self, paragraph: Paragraph, question: str) -> float:
         choice, choice_prob, _ = await self.agent().classify(
-            question=make_classification_prompt(paragraph, question),
+            prompt=make_classification_prompt(paragraph, question),
             choices=(" Yes", " No"),
         )
         return choice_prob if choice == " Yes" else 1 - choice_prob
@@ -512,7 +512,7 @@ Answer:"""
 class PaperQA(Recipe):
     async def classify_paragraph(self, paragraph: Paragraph, question: str) -> float:
         choice, choice_prob, _ = await self.agent().classify(
-            question=make_classification_prompt(paragraph, question),
+            prompt=make_classification_prompt(paragraph, question),
             choices=(" Yes", " No"),
         )
         return choice_prob if choice == " Yes" else 1 - choice_prob

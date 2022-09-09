@@ -172,7 +172,7 @@ class EvaluateResult(Recipe):
             gold_result=gold_result,
         )
         choice, score, _ = await self.agent("instruct").classify(
-            context="", question=classification_prompt, choices=(" Yes", " No")
+            prompt=classification_prompt, choices=(" Yes", " No")
         )
 
         choice = choice.strip()
