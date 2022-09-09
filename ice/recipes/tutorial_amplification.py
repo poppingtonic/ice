@@ -1,6 +1,23 @@
 from ice.recipe import Recipe
 from ice.utils import map_async
-from subquestions import Subquestions
+
+
+def make_subquestion_prompt(question: str) -> str:
+    return f"""Decompose the following question into 2-5 subquestions that would help you answer the question.
+
+Question: "{question}"
+Subquestions:
+-""".strip()
+
+
+class Subquestions(Recipe):
+    async def run(self, question: str = "What is the effect of creatine on cognition?"):
+        prompt = make_subquestion_prompt(question)
+        subquestions_text = await self.agent().answer(
+            prompt=prompt, multiline=True, max_tokens=100
+        )
+        subquestions = [line.strip("- ") for line in subquestions_text.split("\n")]
+        return subquestions
 
 
 Subs = list[tuple[str, str]]
