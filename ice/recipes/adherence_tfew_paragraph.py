@@ -815,7 +815,7 @@ class AdherenceParagraphTfew(Recipe):
         for prompt, choice_inputs in make_multiple_adherence_prompts(
             context=context, section=section, sentence=sentence
         ):
-            choice, _, _ = await self.agent(self.s.qa_model).prompted_classify(
+            choice, _, _ = await self.agent(self.s.qa_model).classify(
                 context=prompt, question="", choices=choice_inputs
             )
             if choice == choice_inputs[1]:

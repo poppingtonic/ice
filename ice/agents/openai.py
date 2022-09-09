@@ -61,7 +61,7 @@ class OpenAIAgent(Agent):
             self._print_markdown(prediction)
         return prediction
 
-    async def prompted_classify(
+    async def classify(
         self,
         *,
         context: str = "",
@@ -136,7 +136,7 @@ class OpenAIAgent(Agent):
         abs_probs = {choice: lookup_prob(choice) for choice in choices}
         Z = sum(abs_probs.values())
         if Z < 0.8:
-            log.warning(f"{1-Z} of unaccounted probability in prompted_classify")
+            log.warning(f"{1-Z} of unaccounted probability in classify")
             log.warning(choice_prefix)
             log.warning(str(prediction))
             log.warning(str(abs_probs))

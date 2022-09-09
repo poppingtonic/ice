@@ -27,7 +27,7 @@ class FakeAgent(Agent):
     ):
         return self.fake.sentence()
 
-    async def prompted_classify(
+    async def classify(
         self,
         *,
         context: str = "",

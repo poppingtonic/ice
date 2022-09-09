@@ -31,7 +31,7 @@ class Agent(TracedABC):
     ) -> dict[str, float]:
         raise NotImplementedError
 
-    async def prompted_classify(
+    async def classify(
         self,
         *,
         context: str = "",

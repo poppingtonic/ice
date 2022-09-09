@@ -171,7 +171,7 @@ class EvaluateResult(Recipe):
             model_result=model_result,
             gold_result=gold_result,
         )
-        choice, score, _ = await self.agent("instruct").prompted_classify(
+        choice, score, _ = await self.agent("instruct").classify(
             context="", question=classification_prompt, choices=(" Yes", " No")
         )
 

@@ -50,7 +50,7 @@ class CachedAgent(Agent):
         self.cache[key] = prediction
         return prediction
 
-    async def prompted_classify(
+    async def classify(
         self,
         *,
         context: str = "",
@@ -60,10 +60,10 @@ class CachedAgent(Agent):
         verbose: bool = False,
     ) -> tuple[str, float, str | None]:
         prompt = context + question
-        key = get_cache_key("prompted_classify", prompt)
+        key = get_cache_key("classify", prompt)
         if key in self.cache:
             return self.cache[key]
-        classification = await self.base_agent.prompted_classify(
+        classification = await self.base_agent.classify(
             context=context, question=question, choices=choices, verbose=verbose
         )
         self.cache[key] = classification

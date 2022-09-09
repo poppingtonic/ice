@@ -33,7 +33,7 @@ class HumanAgent(Agent):
         completion = await env().answer(context, default=default, multiline=False)
         return {completion: 1.0}
 
-    async def prompted_classify(
+    async def classify(
         self,
         *,
         context: str = "",
