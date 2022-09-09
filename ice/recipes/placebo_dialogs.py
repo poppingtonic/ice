@@ -397,7 +397,7 @@ class PlaceboDialogs(Recipe):
         )
 
         # Log for analysis
-        self._maybe_add_to_results(
+        self.maybe_add_to_results(
             [
                 RecipeResult(
                     document_id=paper.document_id,

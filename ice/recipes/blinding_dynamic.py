@@ -367,5 +367,5 @@ class BlindingDynamic(Recipe):
                         excerpts=result.quotes,
                     )
                 )
-        self._maybe_add_to_results(recipe_results)
+        self.maybe_add_to_results(recipe_results)
         return recipe_results

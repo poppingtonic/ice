@@ -93,7 +93,7 @@ class TfewInferenceModel(nn.Module):
         start = perf_counter()
         t5_batch = self.collate_fn(batch)
         input_ids, choices_ids = t5_batch.input_ids, t5_batch.choices_ids
-        input_ids, choices_ids = input_ids.to(self.model.device), choices_ids.to(  # type: ignore[assignment]
+        input_ids, choices_ids = input_ids.to(self.model.device), choices_ids.to(
             self.model.device
         )
         bs, num_choices = choices_ids.size()[:2]

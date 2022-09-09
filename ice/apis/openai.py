@@ -1,12 +1,11 @@
 import httpx
 
-from httpx import ReadTimeout
-from httpx import Timeout
+from httpx import TimeoutException
 from structlog.stdlib import get_logger
 from tenacity import retry
-from tenacity import retry_any
-from tenacity import retry_if_exception
-from tenacity import retry_if_exception_type
+from tenacity.retry import retry_any
+from tenacity.retry import retry_if_exception
+from tenacity.retry import retry_if_exception_type
 from tenacity.wait import wait_random_exponential
 
 from ice.cache import diskcache
@@ -59,8 +58,7 @@ class OpenAIAPIClient:
     @retry(
         retry=retry_any(
             retry_if_exception(is_retryable_HttpError),
-            retry_if_exception_type(Timeout),
-            retry_if_exception_type(ReadTimeout),
+            retry_if_exception_type(TimeoutException),
             retry_if_exception_type(RateLimitError),
             retry_if_exception_type(ProactiveRateLimitError),
         ),

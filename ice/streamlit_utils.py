@@ -1,3 +1,4 @@
+# type: ignore
 import asyncio
 
 from pathlib import Path
@@ -67,5 +68,5 @@ def select_paper(*, default_value: str | None = None):
 def run_recipe(recipe: Recipe, paper: Paper):
     execution_context.new_context(document_id=paper.document_id, task="n/a")
     with st.spinner(f"Running recipe '{recipe}'"):
-        result = asyncio.run(recipe.execute(question="n/a", paper=paper))  # type: ignore
+        result = asyncio.run(recipe.execute(question="n/a", paper=paper))
     return result

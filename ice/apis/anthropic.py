@@ -5,13 +5,12 @@ import urllib.parse
 
 from collections.abc import Sequence
 
-from httpx import ReadTimeout
-from httpx import Timeout
+from httpx import TimeoutException
 from pydantic.json import pydantic_encoder
 from structlog.stdlib import get_logger
 from tenacity import retry
-from tenacity import retry_any
-from tenacity import retry_if_exception_type
+from tenacity.retry import retry_any
+from tenacity.retry import retry_if_exception_type
 from tenacity.wait import wait_random_exponential
 from websockets import client
 
@@ -110,8 +109,7 @@ class AnthropicAPIClient:
 
     @retry(
         retry=retry_any(
-            retry_if_exception_type(Timeout),
-            retry_if_exception_type(ReadTimeout),
+            retry_if_exception_type(TimeoutException),
             retry_if_exception_type(AnthropicError),
         ),
         wait=wait_random_exponential(min=1),
