@@ -230,7 +230,7 @@ const Name = ({ id }: { id: string }) => {
   const recipeClassName = (args as any).self?.class_name;
   return (
     <span>
-      {name === "execute" && recipeClassName
+      {(name === "execute" || name === "run") && recipeClassName
         ? "📋 " + recipeClassName
         : MODEL_CALL_NAMES.includes(name)
         ? "🕵 " + name
