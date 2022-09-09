@@ -5,9 +5,8 @@ from typing import Any
 from structlog.stdlib import get_logger
 
 from ice.agents.base import Agent
-from ice.apis.openai import OpenAIAPIClient
+from ice.apis.openai import openai_complete
 from ice.environment import env
-from ice.settings import settings
 from ice.utils import longest_common_prefix
 
 log = get_logger()
@@ -25,9 +24,6 @@ class OpenAIAgent(Agent):
         self.model = model
         self.temperature = temperature
         self.top_p = top_p
-        self.client = OpenAIAPIClient(
-            api_key=settings.OPENAI_API_KEY, org_id=settings.OPENAI_ORG_ID
-        )
 
     async def answer(
         self,
@@ -101,7 +97,7 @@ class OpenAIAgent(Agent):
                 "n": 1,
             }
         )
-        response = await self.client.complete(prompt, **kwargs)
+        response = await openai_complete(prompt, **kwargs)
         if "choices" not in response:
             raise ValueError(f"No choices in response: {response}")
         return response
