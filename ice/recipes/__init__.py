@@ -22,6 +22,7 @@ from .placebo_simple import PlaceboSimpleInstruct
 from .placebo_tree import PlaceboTree
 from .rank_paragraphs import RankParagraphs
 from .subrecipe_example import ExampleMetaRecipe
+from .tutorial_amplification import AmplifiedQA
 from .tutorial_debate import DebateRecipe
 from .tutorial_hello import HelloWorld
 from .tutorial_paperqa import PaperQA
@@ -35,6 +36,7 @@ def get_recipe_classes() -> list[Type[Recipe]]:
         AdherenceSimpleAnthropic,
         AdherenceSimpleInstruct,
         AllQuotesRecipe,
+        AmplifiedQA,
         BlindingDynamic,
         ComparisonsQA,
         DebateRecipe,
