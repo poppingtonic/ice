@@ -31,7 +31,7 @@ Question: {question_long}
 
 
 class ComparisonsQA(Recipe):
-    async def execute(self, **kw):
+    async def run(self, **kw):
         paper: Paper = kw["paper"]
         question_short: str = kw.get(
             "question_short",
@@ -46,7 +46,7 @@ class ComparisonsQA(Recipe):
 
         rank_paragraphs = RankParagraphs(mode=self.mode)
 
-        top_paragraphs = await rank_paragraphs.execute(
+        top_paragraphs = await rank_paragraphs.run(
             paper=paper, question=question_short, n=num_paragraphs
         )
 

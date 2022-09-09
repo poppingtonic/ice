@@ -253,9 +253,9 @@ Answer:"""
 
 
 class PlaceboTree(Recipe):
-    async def execute(self, *, paper: Paper):
+    async def run(self, *, paper: Paper):
         arms_recipe = ExperimentArms(mode=self.mode)
-        arms, arm_descriptions = await arms_recipe.execute(paper=paper)
+        arms, arm_descriptions = await arms_recipe.run(paper=paper)
 
         placebo_class, placebo_description_draft = await self.classify_placebo(
             paper, arms, arm_descriptions
@@ -513,7 +513,7 @@ Answer:"""
             return description_draft
 
         qa_recipe = ComparisonsQA(mode=self.mode)
-        qa_result = await qa_recipe.execute(
+        qa_result = await qa_recipe.run(
             paper=paper,
             question_short="""What was the placebo?""",
             question_long="""What was the placebo, or what were the placebos used in the study? Describe in a few sentences.""",

@@ -23,7 +23,7 @@ Create a file `hello_world.py`:
 from ice.recipe import Recipe
 
 class HelloWorld(Recipe):
-    async def execute(self):
+    async def run(self):
         return "Hello world!"
 ```
 
@@ -46,13 +46,13 @@ If you follow the link, in your browser you should see a function node that you 
 Some things to note about the recipe:
 
 - We're inhering from the `Recipe` class because that will give us automatic tracing of all async methods for debugging. (Synchronous methods are currently assumed to be simple and fast, and not worth tracing.)
-- `execute` is the name of the method that is called when a recipe is run
-- Most recipe methods, including `execute`, will be async so that language model calls are parallelized as much as possible.
+- `run` is the name of the method that is called when a recipe is run
+- Most recipe methods, including `run`, will be async so that language model calls are parallelized as much as possible.
 - Different recipes take different arguments, which will be provided as keyword-only arguments. This recipe doesn't use any arguments.
 
 ### Exercises
 
-1. Add another method to `HelloWorld` and call it from `execute`. Does it show up in the trace? What if you make it async and call it as `result = await self.my_function()`?
+1. Add another method to `HelloWorld` and call it from `run`. Does it show up in the trace? What if you make it async and call it as `result = await self.my_function()`?
 
 ## Calling an agent: Question-answering
 
@@ -73,7 +73,7 @@ Answer: "
 
 
 class QA(Recipe):
-    async def execute(self, *, question: str = "What is happening on 9/9/2022?"):
+    async def run(self, *, question: str = "What is happening on 9/9/2022?"):
         prompt = make_qa_prompt(question)
         answer = (await self.agent().answer(question=prompt)).strip('" ')
         return answer
@@ -122,7 +122,7 @@ Answer: "
 
 
 class QA(Recipe):
-    async def execute(
+    async def run(
         self, context: str = DEFAULT_CONTEXT, question: str = DEFAULT_QUESTION
     ) -> str:
         prompt = make_qa_prompt(context, question)
@@ -240,7 +240,7 @@ from ice.recipe import Recipe
 
 class DebateRecipe(Recipe):
 
-    async def execute(self, *, question: str = "Should we legalize all drugs?"):
+    async def run(self, *, question: str = "Should we legalize all drugs?"):
         agents = [self.agent(), self.agent()]
         agent_names = ["Alice", "Bob"]
         debate = initialize_debate(question)
@@ -306,7 +306,7 @@ ICE has built-in functionality for parsing and loading papers, and includes some
 from ice.recipe import Recipe
 
 class PaperQA(Recipe):
-    async def execute(self, **kw):
+    async def run(self, **kw):
         paper = kw['paper']
         return paper.paragraphs[0]
 ```
@@ -364,7 +364,7 @@ class PaperQA(Recipe):
         )
         return choice_prob if choice == " Yes" else 1 - choice_prob
 
-    async def execute(self, **kw):
+    async def run(self, **kw):
         paper = kw['paper']
         paragraph = paper.paragraphs[0]
         question = kw.get("question", "What was the study population?")
@@ -411,7 +411,7 @@ class PaperQA(Recipe):
         )
         return choice_prob if choice == " Yes" else 1 - choice_prob
 
-    async def execute(self, **kw):
+    async def run(self, **kw):
         paper = kw['paper']
         paragraph = paper.paragraphs[0]
         question = kw.get("question", "What was the study population?")
@@ -463,7 +463,7 @@ class PaperQA(Recipe):
         )
         return choice_prob if choice == " Yes" else 1 - choice_prob
 
-    async def execute(
+    async def run(
         self, paper: Paper, question: str, top_n: int = 3
     ) -> list[Paragraph]:
         probs = await map_async(
@@ -530,12 +530,12 @@ class PaperQA(Recipe):
         )
         return [par for par, prob in sorted_pairs[:top_n]]
 
-    async def execute(
+    async def run(
         self, paper: Paper, question: str = "What was the study population?"
     ):
         relevant_paragraphs = await self.get_relevant_paragraphs(paper, question)
         relevant_str = "\n\n".join(str(p) for p in relevant_paragraphs)
-        answer = await QA().execute(context=relevant_str, question=question)
+        answer = await QA().run(context=relevant_str, question=question)
         return answer
 ```
 

@@ -9,7 +9,7 @@ log = get_logger()
 
 
 class EvaluateResults(Recipe):
-    async def execute(self, **kw) -> list[ResultComparison]:
+    async def run(self, **kw) -> list[ResultComparison]:
         """
         Compare two lists of results, model and gold standard.
         """
@@ -30,7 +30,7 @@ class EvaluateResults(Recipe):
 
         comparisons = await map_async(
             list(zip(model_results, gold_results)),
-            lambda pair: evaluate_result.execute(
+            lambda pair: evaluate_result.run(
                 question=question, model_result=pair[0], gold_result=pair[1]
             ),
             max_concurrency=self.max_concurrency(),

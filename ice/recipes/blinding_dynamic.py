@@ -343,7 +343,7 @@ class BlindingDynamic(Recipe):
             results_by_group[group] = comparison
         return results_by_group
 
-    async def execute(self, **kw):
+    async def run(self, **kw):
         """
         For each intervention, summarize how it was blinded.
         """

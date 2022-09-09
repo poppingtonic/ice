@@ -1028,7 +1028,7 @@ class AdherenceParagraphTfew(Recipe):
             document_id=document_id, question_short_name=question_short_name
         )
 
-    async def execute(self, **kwargs):
+    async def run(self, **kwargs):
         paper: Paper = kwargs["paper"]
 
         results = []

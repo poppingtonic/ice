@@ -38,7 +38,7 @@ class SinglePrompt(Recipe):
     question_short_name: str
     default_answer_classification: str | None
 
-    async def execute(self, **kw):
+    async def run(self, **kw):
         paper: Paper = kw["paper"]
 
         # Get the full paper text and truncate it

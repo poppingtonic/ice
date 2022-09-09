@@ -41,7 +41,7 @@ class PlaceboKeywordBaseline(Recipe):
                 return PlaceboAnswer("Placebo", sentence)
         return PlaceboAnswer("Not mentioned", "")
 
-    async def execute(self, **kw):
+    async def run(self, **kw):
         paper: Paper = kw["paper"]
         experiments = list_experiments(document_id=paper.document_id)
 

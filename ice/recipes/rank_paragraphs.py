@@ -25,7 +25,7 @@ Answer: Paragraph""".strip()
 
 
 class RankParagraphs(Recipe):
-    async def execute(self, **kw) -> list[Paragraph]:
+    async def run(self, **kw) -> list[Paragraph]:
         """
         Rank the paragraphs by how well they answers the question
         using binary search, repeatedly asking the question "Which of

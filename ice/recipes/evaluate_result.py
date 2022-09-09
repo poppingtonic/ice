@@ -141,7 +141,7 @@ class ResultComparison(BaseModel):
 
 
 class EvaluateResult(Recipe):
-    async def execute(self, **kw) -> ResultComparison:
+    async def run(self, **kw) -> ResultComparison:
 
         model_result: str
         gold_result: str

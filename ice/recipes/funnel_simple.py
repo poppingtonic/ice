@@ -53,7 +53,7 @@ def create_recipe_result(paper_id: str, experiment: str, answer: str) -> RecipeR
 
 
 class FunnelSimple(Recipe):
-    async def execute(self, **kw):
+    async def run(self, **kw):
         paper: Paper = kw["paper"]
 
         full_paper_text = get_paper_text(paper)
