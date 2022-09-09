@@ -23,7 +23,7 @@ Create a file `hello_world.py`:
 from ice.recipe import Recipe
 
 class HelloWorld(Recipe):
-    async def execute(self, **kw):
+    async def execute(self):
         return "Hello world!"
 ```
 
@@ -50,7 +50,7 @@ Some things to note about the recipe:
 - We're inhering from the `Recipe` class because that will give us automatic tracing of all async methods for debugging. (Synchronous methods are currently assumed to be simple and fast, and not worth tracing.)
 - `execute` is the name of the method that is called when a recipe is run
 - Most recipe methods, including `execute`, will be async so that language model calls are parallelized as much as possible.
-- Different recipes take different arguments, which will be provided as keyword arguments captured by `**kw`. This recipe doesn't use any arguments--we're just accepting `**kw` to make the function type consistent.
+- Different recipes take different arguments, which will be provided as keyword-only arguments. This recipe doesn't use any arguments.
 
 ### Exercises
 
@@ -73,8 +73,7 @@ Answer: "
 
 
 class QA(Recipe):
-    async def execute(self, **kw):
-        question = kw.get("question", "What is happening on 9/9/2022?")
+    async def execute(self, *, question: str = "What is happening on 9/9/2022?"):
         prompt = make_qa_prompt(question)
         answer = (await self.agent().answer(question=prompt)).strip('" ')
         return answer
@@ -202,8 +201,7 @@ from ice.recipe import Recipe
 
 class DebateRecipe(Recipe):
 
-    async def execute(self, **kw):
-        question = kw.get("question", "Should we legalize all drugs?")
+    async def execute(self, *, question: str = "Should we legalize all drugs?"):
         agents = [self.agent(), self.agent()]
         agent_names = ["Alice", "Bob"]
         debate = initialize_debate(question)
