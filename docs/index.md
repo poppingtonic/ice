@@ -566,4 +566,9 @@ Take a look at the trace to see how it all fits together.
 - Filters & verifiers
 - Selection-Inference
 - Other structures from Cascades, Prompt Chainer, and Maeutic prompting paper
-- Unfold/fold structure
+- Iteration & debugging workflow
+  - Result tables vs gold standards
+  - Trace debugger, zooming in on flaws
+  - Automated evaluation fo results against gold standards
+- Relation to probabilistic generative models: Conditioning
+- WebGPT: Language models that use tools
