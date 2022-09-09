@@ -290,7 +290,7 @@ class PlaceboTree(Recipe):
                 result=placebo_description,
                 excerpts=[],
             )
-            self._maybe_add_to_results([recipe_result])
+            self.maybe_add_to_results([recipe_result])
 
         return placebo_class, placebo_description
 

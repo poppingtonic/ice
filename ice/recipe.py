@@ -1,5 +1,8 @@
+from abc import abstractmethod
 from collections.abc import Callable
+from typing import final
 from typing import Generic
+from typing import no_type_check
 from typing import TypeGuard
 from typing import TypeVar
 
@@ -39,7 +42,13 @@ class Recipe(TracedABC, Generic[RecipeSettings]):
         """A unique identifier for this recipe, which does not change when the recipe is updated."""
         return cls.__name__.lower()
 
-    def _maybe_add_to_results(self, results: list[RecipeResult] | object):
+    @no_type_check
+    @abstractmethod
+    async def run(self, **kwargs):
+        raise NotImplementedError
+
+    @final
+    def maybe_add_to_results(self, results: list[RecipeResult] | object):
         if is_list_of_recipe_result(results):
             self.results.extend(results)
 

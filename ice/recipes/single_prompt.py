@@ -65,6 +65,6 @@ class SinglePrompt(Recipe):
             )
             for experiment in experiments
         ]
-        self._maybe_add_to_results(recipe_results)
+        self.maybe_add_to_results(recipe_results)
 
         return answer

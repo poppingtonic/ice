@@ -1,3 +1,4 @@
+# type: ignore
 import asyncio
 
 import streamlit as st
@@ -25,7 +26,7 @@ def cached_gold_paragraph_df(question: str):
 def run_recipe_on_paragraph(recipe: Recipe, paragraph: Paragraph, experiment: str):
 
     paragraph_result = asyncio.run(
-        recipe.analyze_paragraph(  # type: ignore
+        recipe.analyze_paragraph(
             paragraph=paragraph,
             experiment=experiment,
         )

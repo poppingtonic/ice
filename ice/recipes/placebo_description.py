@@ -99,7 +99,7 @@ class PlaceboDescription(Recipe):
             recipe_results = [
                 create_recipe_result(paper.document_id, experiment, placebo)
             ]
-            self._maybe_add_to_results(recipe_results)
+            self.maybe_add_to_results(recipe_results)
 
             results[experiment] = placebo
 

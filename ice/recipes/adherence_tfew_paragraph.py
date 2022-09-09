@@ -1053,7 +1053,7 @@ class AdherenceParagraphTfew(Recipe):
 
             results.append(recipe_result)
 
-        self._maybe_add_to_results(results)
+        self.maybe_add_to_results(results)
         return results
 
 

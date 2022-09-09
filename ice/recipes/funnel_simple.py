@@ -77,6 +77,6 @@ class FunnelSimple(Recipe):
             create_recipe_result(paper_id, experiment, "\n---\n".join(descriptions))
             for experiment in experiments
         ]
-        self._maybe_add_to_results(recipe_results)
+        self.maybe_add_to_results(recipe_results)
 
         return "\n\n---\n\n".join(descriptions)
