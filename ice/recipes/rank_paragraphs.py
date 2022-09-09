@@ -25,19 +25,14 @@ Answer: Paragraph""".strip()
 
 
 class RankParagraphs(Recipe):
-    async def run(self, **kw) -> list[Paragraph]:
+    async def run(
+        self, paper: Paper, question: str = "What are the interventions?", n: int = 5
+    ) -> list[Paragraph]:
         """
         Rank the paragraphs by how well they answers the question
         using binary search, repeatedly asking the question "Which of
         paragraphs A and B better answer question Q?"
         """
-
-        paper: Paper = kw["paper"]
-        if self.mode == "test":
-            question = "What are the interventions?"
-        else:
-            question = kw["question"]
-        n: int = kw.get("n", 5)
 
         async def cmp(a: Paragraph, b: Paragraph) -> int:
             progress_bar.update(1)

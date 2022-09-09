@@ -17,7 +17,7 @@ This tutorial requires that you've set up ICE as described in [the ICE README](h
 
 Let's first get used to the infrastructure for writing, running, and debugging recipes:
 
-Create a file `hello_world.py`:
+Create a file `hello.py`:
 
 ```py
 from ice.recipe import Recipe
@@ -30,7 +30,7 @@ class HelloWorld(Recipe):
 Run the recipe:
 
 ```sh
-scripts/run-recipe.sh -r hello_world.py -t
+scripts/run-recipe.sh -r hello.py -t
 ```
 
 This will run the recipe, creating an execution trace (`-t`).
@@ -240,7 +240,7 @@ from ice.recipe import Recipe
 
 class DebateRecipe(Recipe):
 
-    async def run(self, *, question: str = "Should we legalize all drugs?"):
+    async def run(self, question: str = "Should we legalize all drugs?"):
         agents = [self.agent(), self.agent()]
         agent_names = ["Alice", "Bob"]
         debate = initialize_debate(question)
@@ -304,10 +304,10 @@ ICE has built-in functionality for parsing and loading papers, and includes some
 
 ```py
 from ice.recipe import Recipe
+from ice.paper import Paper
 
 class PaperQA(Recipe):
-    async def run(self, **kw):
-        paper = kw['paper']
+    async def run(self, paper: Paper):
         return paper.paragraphs[0]
 ```
 
@@ -346,7 +346,7 @@ Our single-paragraph classifier looks like this:
 
 ```py
 from ice.recipe import Recipe
-from ice.paper import Paragraph
+from ice.paper import Paper, Paragraph
 
 def make_prompt(paragraph: Paragraph, question: str) -> str:
     return f"""
@@ -364,8 +364,7 @@ class PaperQA(Recipe):
         )
         return choice_prob if choice == " Yes" else 1 - choice_prob
 
-    async def run(self, **kw):
-        paper = kw['paper']
+    async def run(self, paper: Paper):
         paragraph = paper.paragraphs[0]
         question = kw.get("question", "What was the study population?")
         return await self.classify_paragraph(paragraph, question)
@@ -393,7 +392,7 @@ For mapping, we use the utility `map_async` which runs the language model calls 
 
 ```py
 from ice.recipe import Recipe
-from ice.paper import Paragraph
+from ice.paper import Paper, Paragraph
 from ice.utils import map_async
 
 def make_prompt(paragraph: Paragraph, question: str) -> str:
@@ -411,8 +410,7 @@ class PaperQA(Recipe):
         )
         return choice_prob if choice == " Yes" else 1 - choice_prob
 
-    async def run(self, **kw):
-        paper = kw['paper']
+    async def run(self, paper: Paper):
         paragraph = paper.paragraphs[0]
         question = kw.get("question", "What was the study population?")
         probs = await map_async(paper.paragraphs, lambda par: self.classify_paragraph(par, question))

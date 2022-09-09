@@ -11,8 +11,7 @@ class AllQuotesRecipe(Recipe):
     # are actually in the parses
     question_short_name_to_test = "placebo"
 
-    async def run(self, **kw):
-        paper: Paper = kw["paper"]
+    async def run(self, paper: Paper):
         experiments = list_experiments(document_id=paper.document_id)
 
         results: list[RecipeResult] = []

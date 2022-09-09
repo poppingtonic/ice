@@ -55,9 +55,7 @@ class ExperimentArms(Recipe):
         )
         return arm_descriptions
 
-    async def run(self, **kw):
-        paper: Paper = kw["paper"]
-
+    async def run(self, paper: Paper):
         arms = await self.get_arms(paper)
 
         arm_descriptions = await self.get_arm_descriptions(paper, arms)

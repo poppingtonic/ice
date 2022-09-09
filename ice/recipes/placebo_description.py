@@ -79,9 +79,7 @@ class PlaceboDescription(Recipe):
 
         return placebo_description
 
-    async def run(self, record=recorder, **kw):
-        paper: Paper = kw["paper"]
-
+    async def run(self, paper: Paper, record=recorder):
         # Get the list of experiments (for now from gold standards)
         experiments = await self.get_gold_experiments(paper)
 
