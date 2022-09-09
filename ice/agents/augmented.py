@@ -22,24 +22,21 @@ class AugmentedAgent(Agent):
     async def answer(
         self,
         *,
-        context="",
-        question,
-        multiline=False,
-        verbose=False,
-        default="",
+        prompt: str,
+        multiline: bool = False,
+        verbose: bool = False,
+        default: str = "",
         max_tokens: int | None = None,
     ):
         machine_resp = await self.machine.answer(
-            context=context,
-            question=question,
+            prompt=prompt,
             multiline=multiline,
             verbose=verbose,
             default=default,
             max_tokens=max_tokens,
         )
         return await self.human.answer(
-            context=context,
-            question=question,
+            prompt=prompt,
             multiline=multiline,
             verbose=verbose,
             default=machine_resp,

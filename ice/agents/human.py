@@ -6,17 +6,14 @@ class HumanAgent(Agent):
     async def answer(
         self,
         *,
-        context="",
-        question,
-        multiline=False,
-        verbose=False,
-        default="",
+        prompt: str,
+        multiline: bool = False,
+        verbose: bool = False,
+        default: str = "",
         max_tokens: int | None = None,
     ) -> str:
         verbose  # ignored for HumanAgent
-        completion = await env().answer(
-            context + question, default=default, multiline=multiline
-        )
+        completion = await env().answer(prompt, default=default, multiline=multiline)
         return completion
 
     async def relevance(

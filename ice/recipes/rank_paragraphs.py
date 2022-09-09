@@ -38,8 +38,7 @@ class RankParagraphs(Recipe):
             progress_bar.update(1)
             answer = (
                 await self.agent().answer(
-                    context="",
-                    question=make_compare_paragraphs_prompt(a, b, question),
+                    prompt=make_compare_paragraphs_prompt(a, b, question),
                     multiline=False,
                     max_tokens=1,
                 )

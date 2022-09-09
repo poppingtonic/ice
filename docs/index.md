@@ -75,7 +75,7 @@ Answer: "
 class QA(Recipe):
     async def run(self, *, question: str = "What is happening on 9/9/2022?"):
         prompt = make_qa_prompt(question)
-        answer = (await self.agent().answer(question=prompt)).strip('" ')
+        answer = (await self.agent().answer(prompt=prompt)).strip('" ')
         return answer
 ```
 
@@ -126,7 +126,7 @@ class QA(Recipe):
         self, context: str = DEFAULT_CONTEXT, question: str = DEFAULT_QUESTION
     ) -> str:
         prompt = make_qa_prompt(context, question)
-        answer = (await self.agent().answer(question=prompt)).strip('" ')
+        answer = (await self.agent().answer(prompt=prompt)).strip('" ')
         return answer
 ```
 
@@ -257,7 +257,7 @@ class DebateRecipe(Recipe):
     ):
         prompt = render_debate_prompt(agent_name, debate, turns_left)
         answer = await agent.answer(
-            question=prompt, multiline=False, max_tokens=100
+            prompt=prompt, multiline=False, max_tokens=100
         )
         return (agent_name, answer.strip('" '))
 ```

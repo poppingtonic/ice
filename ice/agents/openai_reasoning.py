@@ -31,8 +31,7 @@ class OpenAIReasoningAgent(Agent):
     async def answer(
         self,
         *,
-        context: str = "",
-        question: str,
+        prompt: str,
         multiline: bool = False,
         verbose: bool = False,
         default: str = "",

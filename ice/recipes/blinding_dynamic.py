@@ -226,23 +226,21 @@ def parse_quotes(s: str, ignore="n/a"):
     ]
 
 
-def make_paragraph_prompt(
-    paragraph: Paragraph, intervention: str, group: Group
-) -> tuple[str, str]:
+def make_paragraph_prompt(paragraph: Paragraph, intervention: str, group: Group) -> str:
     context = PARTICIPANTS_CONTEXT if group == "participants" else PERSONNEL_CONTEXT
     question = f"""Paragraph: {str(paragraph)}
 
 Quotes from paragraph that say whether the {group} in the "{intervention}" intervention were blinded to allocation:"""
-    return (context, question)
+    return context + question
 
 
 def make_followup_paragraph_prompt(
     paragraph: Paragraph, intervention: str, group: Group, answer: str
-):
-    prev_context, prev_question = make_paragraph_prompt(paragraph, intervention, group)
-    new_context = f"{prev_context}{prev_question} {answer}\n\n"
+) -> str:
+    prev_prompt = make_paragraph_prompt(paragraph, intervention, group)
+    new_context = f"{prev_prompt} {answer}\n\n"
     new_question = f"""Other quotes from this paragraph relevant to whether the {group} in the "{intervention}" intervention were blinded to allocation:"""
-    return (new_context, new_question)
+    return new_context + new_question
 
 
 class BlindingDynamic(Recipe):
@@ -261,17 +259,15 @@ class BlindingDynamic(Recipe):
         Does this paragraph state that [group] is blinded wrt
         [intervention]? Return an answer supported by a quote.
         """
-        context, question = make_paragraph_prompt(paragraph, intervention, group)
-        raw_quotes = await self.agent().answer(
-            context=context, question=question, multiline=True
-        )
+        prompt = make_paragraph_prompt(paragraph, intervention, group)
+        raw_quotes = await self.agent().answer(prompt=prompt, multiline=True)
         quotes = parse_quotes(raw_quotes, ignore="n/a")
         if quotes and ask_followup:
-            followup_context, followup_question = make_followup_paragraph_prompt(
+            followup_prompt = make_followup_paragraph_prompt(
                 paragraph, intervention, group, raw_quotes
             )
             followup_quotes = await self.agent().answer(
-                context=followup_context, question=followup_question, multiline=True
+                prompt=followup_prompt, multiline=True
             )
             lines = parse_quotes(followup_quotes, ignore="n/a")
             quotes += lines
@@ -280,7 +276,7 @@ class BlindingDynamic(Recipe):
                 quotes_string = " ".join(quotes)
                 if gold_quote not in quotes_string:
                     rich.print(
-                        Panel(f"{question} {quotes_string}\n\nGold quote: {gold_quote}")
+                        Panel(f"{prompt} {quotes_string}\n\nGold quote: {gold_quote}")
                     )
         # rich.print(Panel(f"{question} {quotes}"))
         return ParagraphResult(quotes=quotes, paragraph=paragraph)

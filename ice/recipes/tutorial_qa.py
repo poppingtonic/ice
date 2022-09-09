@@ -22,5 +22,5 @@ class QA(Recipe):
         self, context: str = DEFAULT_CONTEXT, question: str = DEFAULT_QUESTION
     ) -> str:
         prompt = make_qa_prompt(context, question)
-        answer = (await self.agent().answer(question=prompt)).strip('" ')
+        answer = (await self.agent().answer(prompt=prompt)).strip('" ')
         return answer

@@ -18,11 +18,10 @@ class FakeAgent(Agent):
     async def answer(
         self,
         *,
-        context="",
-        question,
-        multiline=False,
-        verbose=False,
-        default="",
+        prompt: str,
+        multiline: bool = False,
+        verbose: bool = False,
+        default: str = "",
         max_tokens: int | None = None,
     ):
         return self.fake.sentence()

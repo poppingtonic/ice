@@ -66,8 +66,7 @@ def select_agent_method():
 
 def select_answer_params():
     max_tokens = int(st.number_input("Max tokens", value=100))
-    context = st.text_area("Enter context", height=100)
-    question = st.text_area(
+    prompt = st.text_area(
         "Enter question",
         value="""
 Human: Hi!
@@ -75,15 +74,13 @@ Human: Hi!
 Assistant:""",
         height=300,
     )
-    return context, question, max_tokens
+    return prompt, max_tokens
 
 
-def call_agent_answer(agent: Agent, context: str, question: str, max_tokens: int):
+def call_agent_answer(agent: Agent, prompt: str, max_tokens: int):
 
     start_time = time.time()
-    response = asyncio.run(
-        agent.answer(context=context, question=question, max_tokens=max_tokens)
-    )
+    response = asyncio.run(agent.answer(prompt=prompt, max_tokens=max_tokens))
     elapsed = time.time() - start_time
 
     return response, elapsed
@@ -108,10 +105,10 @@ def main():
         st.exit()
 
     # User selects answer params
-    context, question, max_tokens = select_answer_params()
+    prompt, max_tokens = select_answer_params()
 
     # Call agent method
-    response, elapsed = call_agent_answer(agent, context, question, max_tokens)
+    response, elapsed = call_agent_answer(agent, prompt, max_tokens)
     st.markdown(" > " + response)
     st.write(f"Response time: {elapsed:.2f} seconds")
 

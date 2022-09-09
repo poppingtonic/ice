@@ -46,22 +46,20 @@ class ApprovalAgent(Agent):
     async def answer(
         self,
         *,
-        context="",
-        question,
-        multiline=False,
-        verbose=False,
-        default="",
+        prompt: str,
+        multiline: bool = False,
+        verbose: bool = False,
+        default: str = "",
         max_tokens: int | None = None,
     ):
         completion = await self.base_agent.answer(
-            context=context,
-            question=question,
+            prompt=prompt,
             multiline=multiline,
             verbose=verbose,
             default=default,
             max_tokens=max_tokens,
         )
-        await self._check(prompt=question, candidate=completion)
+        await self._check(prompt=prompt, candidate=completion)
         return completion
 
     async def relevance(self, *, question, context, verbose=False, default=None):
@@ -91,9 +89,7 @@ Is this output correct (y/n)?"""
                 assert is_yes(str(cache[approval_prompt]))
                 return
 
-        approval_action = await self.approval_agent.answer(
-            context="", question=approval_prompt
-        )
+        approval_action = await self.approval_agent.answer(prompt=approval_prompt)
 
         if not is_yes(approval_action):
             raise NotApprovedException

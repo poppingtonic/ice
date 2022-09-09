@@ -52,5 +52,5 @@ class DebateRecipe(Recipe):
         self, debate: Debate, agent: Agent, agent_name: Name, turns_left: int
     ):
         prompt = render_debate_prompt(agent_name, debate, turns_left)
-        answer = await agent.answer(question=prompt, multiline=False, max_tokens=100)
+        answer = await agent.answer(prompt=prompt, multiline=False, max_tokens=100)
         return (agent_name, answer.strip('" '))

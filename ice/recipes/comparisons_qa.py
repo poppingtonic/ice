@@ -62,7 +62,7 @@ class ComparisonsQA(Recipe):
         )
 
         answer = await self.agent().answer(
-            context="", question=qa_prompt, multiline=True, max_tokens=500
+            prompt=qa_prompt, multiline=True, max_tokens=500
         )
 
         return answer
