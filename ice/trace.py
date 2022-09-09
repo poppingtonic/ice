@@ -43,14 +43,12 @@ def _url_prefix():
     return "http://localhost:3000"
 
 
-def enable_trace(browser: bool = False):
+def enable_trace():
     global trace_file
 
     trace_file = (trace_dir / f"{trace_id}.jsonl").open("a")
 
-    # "Opening trace" is matched by scripts/open_in_browser.py, which runs on the host.
-    prefix = "Opening trace" if browser else "Trace"
-    print(f"{prefix}: {_url_prefix()}/traces/{trace_id}")
+    print(f"Trace: {_url_prefix()}/traces/{trace_id}")
 
 
 trace_dir = Path(__file__).parent.parent / "ui" / "public" / "traces"

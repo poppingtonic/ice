@@ -35,8 +35,6 @@ scripts/run-recipe.sh -r hello_world.py -t
 
 This will run the recipe, creating an execution trace (`-t`).
 
-If you'd like to automatically open a browser window, add `-b`, but note that this will only work if your system has the `open` or `xdg-open` command, and in particular, won't work in a Codespace.
-
 On the terminal, after a few lines about Docker and the trace link, you should see this:
 
 ```
