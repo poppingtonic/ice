@@ -324,7 +324,7 @@ const getShortString = (value: any, maxLength: number = 35): string => {
     }
   }
 
-  const string = `${getFirstDescendant(value)}`;
+  const string = `${getFirstDescendant(value) ?? "()"}`;
   return string.length > maxLength ? string.slice(0, maxLength).trim() + "..." : string;
 };
 
