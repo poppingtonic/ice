@@ -48,7 +48,7 @@ Some things to note about the recipe:
 - We're inhering from the `Recipe` class because that will give us automatic tracing of all async methods for debugging. (Synchronous methods are currently assumed to be simple and fast, and not worth tracing.)
 - `run` is the name of the method that is called when a recipe is run
 - Most recipe methods, including `run`, will be async so that language model calls are parallelized as much as possible.
-- Different recipes take different arguments, which will be provided as keyword-only arguments. This recipe doesn't use any arguments.
+- Different recipes take different arguments, which will be provided as keyword arguments. This recipe doesn't use any arguments.
 
 ### Exercises
 
@@ -553,8 +553,201 @@ Take a look at the trace to see how it all fits together.
 3. (Advanced) Implement debate with agents that have access to the same paper, and let agents provide quotes from the paper that can't be faked. Does being able to refer to ground truth quotes favor truth in debate?
 
 
+## Amplification: Recursive question-answering
+
+Amplification is the idea that agents can make subcalls to copies of themselves to inform how to answer a question or make a decision.
+
+### Asking subquestions
+
+Let's start by making a recipe that returns subquestions given a question:
+
+```py
+from ice.recipe import Recipe
+
+
+def make_subquestion_prompt(question: str) -> str:
+    return f"""Decompose the following question into 2-5 subquestions that would help you answer the question.
+
+Question: "{question}"
+Subquestions:
+-""".strip()
+
+
+class Subquestions(Recipe):
+    async def run(self, question: str = "What is the effect of creatine on cognition?"):
+        prompt = make_subquestion_prompt(question)
+        subquestions_text = await self.agent().answer(
+            prompt=prompt, multiline=True, max_tokens=100
+        )
+        subquestions = [line.strip("- ") for line in subquestions_text.split("\n")]
+        return subquestions
+```
+
+If we save this as `subquestions.py` and run it...
+
+```py
+./scripts/run-recipe.sh -r subquestions.py -t
+```
+
+...we get:
+
+```py
+[
+    'What is creatine?',
+    'What is cognition?',
+    'How does creatine affect cognition?',
+    'What are the benefits of creatine on cognition?',
+    'What are the side effects of creatine on cognition?'
+]
+```
+
+### Answering subquestions
+
+Now we want to use the subquestions recipe to help a question-answerer like the one we built early on in this tutorial. We can start with the question-answerer we built earlier and modify it as follows:
+
+1. Add a call to the subquestions recipe to generate subquestions
+2. Use `map_async` to answer all the subquestions in parallel
+3. Provide answers from subquestions as advice in the overall question-answering prompt
+
+Let's start with (1) and (2), reusing the subquestions subrecipe:
+
+```
+from ice.recipe import Recipe
+from ice.utils import map_async
+from subquestions import Subquestions
+
+
+def make_qa_prompt(question: str) -> str:
+    return f"""Answer the following question:
+
+Question: "{question}"
+Answer: "
+""".strip()
+
+
+class AmplifiedQA(Recipe):
+
+    async def answer(self, question: str) -> str:
+        prompt = make_qa_prompt(question)
+        answer = (await self.agent().answer(prompt=prompt, max_tokens=100)).strip('" ')
+        return answer
+
+    async def run(self, question: str = "What is the effect of creatine on cognition?"):
+         subquestions = await Subquestions().run(question=question)
+         subanswers = await map_async(subquestions, self.answer)
+         return list(zip(subquestions, subanswers))
+```
+
+If we run this, we get back a list of subquestions and their answers:
+
+```py
+[
+    (
+        'What is creatine?',
+        'Creatine is a nitrogenous organic acid that helps supply energy to cells, primarily in the muscles.'
+    ),
+    (
+        'What is cognition?',
+        'Cognition is the mental action or process of acquiring knowledge and understanding through thought, experience, and the senses.'
+    ),
+    (
+        'How does creatine affect cognition?',
+        'Creatine is a dietary supplement that is often used by athletes to improve their performance. Some research has suggested that it may also improve cognitive function, but the evidence is mixed. Some studies have found that creatine can improve memory and reaction time, while others have found no significant effects.'
+    ),
+    (
+        'What are the benefits of creatine on cognition?',
+        'Creatine has been shown to improve cognitive function in people with certain medical conditions, such as Parkinson’s disease and Alzheimer’s disease. It has also been shown to improve cognitive function in healthy adults.'
+    ),
+    (
+        'What are the side effects of creatine on cognition?',
+        'There is no definitive answer to this question as the research on the topic is inconclusive. Some studies suggest that creatine may improve cognitive function, while other studies have found no significant effects. More research is needed to determine the potential cognitive effects of creatine.'
+    )
+]
+```
+
+### One-step amplification: Answering given subquestion answers
+
+We need an equivalent of `make_qa_prompt` that optionally takes a list of subquestions and answers and provides those in the prompt. Let's introduce a type `Subs` for pairs of questions and answers and extend `make_qa_prompt` to use it if given:
+
+```py
+Subs = list[tuple[str, str]]
+
+
+def render_background(subs: Subs) -> str:
+    if not subs:
+        return ""
+    subs_text = "\n\n".join(f"Q: {q}\nA: {a}" for (q, a) in subs)
+    return f"Here is relevant background information:\n\n{subs_text}\n\n"
+
+
+def make_qa_prompt(question: str, subs: Subs) -> str:
+    background_text = render_background(subs)
+    return f"""{background_text}Answer the following question, using the background information above where helpful:
+
+Question: "{question}"
+Answer: "
+""".strip()
+```
+
+Now we can render prompts like this:
+
+```
+Here is relevant background information:
+Q: What is creatine?
+A: Creatine is a nitrogenous organic acid that helps supply energy to cells, primarily in the muscles.
+
+Q: What is cognition?
+A: Cognition is the mental action or process of acquiring knowledge and understanding through thought, experience, and the senses.
+
+...
+
+Q: What are the side effects of creatine on cognition?
+A: Creatine has been shown to improve cognitive function in people with certain medical conditions, but it is not known to have any side effects on cognition.
+
+Answer the following question, using the background information above where helpful:
+
+Question: "What is the effect of creatine on cognition?"
+Answer: "
+```
+
+With this in hand, we can write the one-step amplified Q&A recipe:
+
+```py
+class AmplifiedQA(Recipe):
+    async def answer(self, question: str, subs: Subs = []) -> str:
+        prompt = make_qa_prompt(question, subs=subs)
+        answer = (await self.agent().answer(prompt=prompt, max_tokens=100)).strip('" ')
+        return answer
+
+    async def run(self, question: str = "What is the effect of creatine on cognition?"):
+        subquestions = await Subquestions().run(question=question)
+        subanswers = await map_async(subquestions, self.answer)
+        subs = list(zip(subquestions, subanswers))
+        answer = await self.answer(question=question, subs=subs)
+        return answer
+```
+
+If we run it with
+
+```sh
+scripts/run-recipe.sh -r amplified_qa.py -t
+```
+
+we get:
+
+```
+The effect of creatine on cognition is mixed. Some studies have found that creatine can help improve memory and reaction time, while other studies have found no significant effects. It is possible that the effects of creatine on cognition may vary depending on the individual.
+```
+
+Compare with the unamplified answer:
+
+```
+Creatine has been shown to improve cognition in people with Alzheimer's disease and other forms of dementia.
+```
+
 ## Future tutorial topics
 
+- Recursive amplification: Fold/unfold structure
 - Other recipe components we've written, e.g. paragraph ranking
 - Amplification
 - Agent methods: Relevance etc
@@ -566,4 +759,10 @@ Take a look at the trace to see how it all fits together.
 - Filters & verifiers
 - Selection-Inference
 - Other structures from Cascades, Prompt Chainer, and Maeutic prompting paper
-- Unfold/fold structure
+- Iteration & debugging workflow
+  - Result tables vs gold standards
+  - Trace debugger, zooming in on flaws
+  - Automated evaluation fo results against gold standards
+- Relation to probabilistic generative models: Conditioning
+- WebGPT: Language models that use tools
+- Memory
