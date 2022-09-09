@@ -1,4 +1,3 @@
-from abc import abstractmethod
 from collections.abc import Callable
 from typing import Generic
 from typing import TypeGuard
@@ -34,11 +33,6 @@ class Recipe(TracedABC, Generic[RecipeSettings]):
         self.mode = mode
         self.s = settings or self.defaults()
         self.results: list[RecipeResult] = []
-
-    @abstractmethod
-    async def execute(self, **kw):
-        # To be implemented by the recipe itself
-        raise NotImplementedError
 
     @classmethod
     def slug(cls) -> str:

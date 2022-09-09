@@ -253,9 +253,7 @@ Answer:"""
 
 
 class PlaceboTree(Recipe):
-    async def execute(self, **kw):
-        paper: Paper = kw["paper"]
-
+    async def execute(self, *, paper: Paper):
         arms_recipe = ExperimentArms(mode=self.mode)
         arms, arm_descriptions = await arms_recipe.execute(paper=paper)
 
