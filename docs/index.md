@@ -11,7 +11,7 @@ We'll call programs that describe such compositions _recipes_.
 
 ## Before we start
 
-This tutorial requires that you've set up ICE as described in [the ICE README](https://github.com/oughtinc/ice9#interactive-composition-explorer-).
+This tutorial requires that you've set up ICE as described in [the ICE README](https://github.com/oughtinc/ice#interactive-composition-explorer-).
 
 ## The simplest recipe: Hello world!
 
