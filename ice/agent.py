@@ -1,5 +1,4 @@
 from functools import cache
-from typing import Optional
 
 from ice.agents.anthropic import AnthropicAgent
 from ice.agents.approval import ApprovalAgent
@@ -53,7 +52,7 @@ def _get_approval_agent(agent_name: str | None = None) -> ApprovalAgent:
     return ApprovalAgent(base_agent=m_agent, approval_agent=h_agent)
 
 
-def agent_policy(mode: Mode, agent_name: Optional[str] = None) -> Agent:
+def agent_policy(mode: Mode, agent_name: str | None = None) -> Agent:
     if mode == "human":
         return HumanAgent()
     elif mode == "augmented":
@@ -73,3 +72,16 @@ def agent_policy(mode: Mode, agent_name: Optional[str] = None) -> Agent:
         return _get_approval_agent(agent_name)
     else:
         raise ValueError(f"Unknown mode: {mode}")
+
+
+_mode: Mode | None = None
+
+
+def set_mode(mode: Mode):
+    global _mode
+    _mode = mode
+
+
+def get_agent(agent_name: str | None = None) -> Agent:
+    assert _mode is not None, "Expected set_mode() to have been called first"
+    return agent_policy(_mode, agent_name)
