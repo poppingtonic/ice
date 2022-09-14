@@ -18,7 +18,6 @@ from structlog.stdlib import get_logger
 
 from ice.agent import Agent
 from ice.agent import agent_policy
-from ice.agent import set_mode
 from ice.environment import env
 from ice.evaluation.evaluate_recipe_result import EvaluatedRecipeResult
 from ice.evaluation.evaluate_recipe_result import RecipeResult
@@ -88,43 +87,51 @@ class Recipe(TracedABC, Generic[RecipeSettings]):
         return self.__class__.__name__
 
 
-def recipe(main):
-    # Trace all globals defined in main's module.
-    g = main.__globals__
-    for name, value in g.items():
-        if getattr(value, "__module__", None) == main.__module__:
-            g[name] = trace(value)
+class RecipeHelper:
+    def __init__(self):
+        self._mode: Mode | None = "machine"
 
-    if main.__module__ != "__main__":
-        return trace(main)
+    def main(self, main):
+        # Trace all globals defined in main's module.
+        g = main.__globals__
+        for name, value in g.items():
+            if getattr(value, "__module__", None) == main.__module__:
+                g[name] = trace(value)
 
-    # The frontend shows everything under the first traced root.
-    # TODO: Once main.py is gone, change the frontend and get rid of this wrapper.
-    @trace
-    @wraps(main)
-    async def hidden_wrapper(*args, **kwargs):
-        result = await trace(main)(*args, **kwargs)
-        env().print(
-            result,
-            format_markdown=False,
-        )
-        return result
+        if main.__module__ != "__main__":
+            return trace(main)
 
-    # A traced function cannot be called until the event loop is running.
-    @wraps(main)
-    async def untraced_wrapper(*args, **kwargs):
-        return await hidden_wrapper(*args, **kwargs)
+        # The frontend shows everything under the first traced root.
+        # TODO: Once main.py is gone, change the frontend and get rid of this wrapper.
+        @trace
+        @wraps(main)
+        async def hidden_wrapper(*args, **kwargs):
+            result = await trace(main)(*args, **kwargs)
+            env().print(result, format_markdown=False)
+            return result
 
-    @merge_args(main)
-    def cli(
-        *args,
-        mode: Mode = "machine",
-        trace: bool = False,
-        **kwargs,
-    ):
-        set_mode(mode)
-        if trace:
-            enable_trace()
-        asyncio.run(untraced_wrapper(*args, **kwargs))
+        # A traced function cannot be called until the event loop is running.
+        @wraps(main)
+        async def untraced_wrapper(*args, **kwargs):
+            return await hidden_wrapper(*args, **kwargs)
 
-    defopt.run(cli, parsers={Paper: lambda path: Paper.load(Path(path))})
+        @merge_args(main)
+        def cli(
+            *args,
+            mode: Mode = "machine",
+            trace: bool = False,
+            **kwargs,
+        ):
+            self._mode = mode
+            if trace:
+                enable_trace()
+            asyncio.run(untraced_wrapper(*args, **kwargs))
+
+        defopt.run(cli, parsers={Paper: lambda path: Paper.load(Path(path))})
+
+    def agent(self, agent_name: str | None = None) -> Agent:
+        assert self._mode
+        return agent_policy(self._mode, agent_name)
+
+
+recipe = RecipeHelper()
