@@ -72,16 +72,3 @@ def agent_policy(mode: Mode, agent_name: str | None = None) -> Agent:
         return _get_approval_agent(agent_name)
     else:
         raise ValueError(f"Unknown mode: {mode}")
-
-
-_mode: Mode | None = None
-
-
-def set_mode(mode: Mode):
-    global _mode
-    _mode = mode
-
-
-def get_agent(agent_name: str | None = None) -> Agent:
-    assert _mode is not None, "Expected set_mode() to have been called first"
-    return agent_policy(_mode, agent_name)
