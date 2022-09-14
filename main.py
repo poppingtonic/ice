@@ -34,7 +34,7 @@ def main_cli(
     input_files: list[str] | None = None,
     gold_standard_splits: list[str] | None = None,
     question_short_name: str | None = None,
-    trace: bool = False,
+    trace: bool = True,
     args: dict | None = None,
 ):
     """

@@ -119,7 +119,7 @@ class RecipeHelper:
         def cli(
             *args,
             mode: Mode = "machine",
-            trace: bool = False,
+            trace: bool = True,
             **kwargs,
         ):
             self._mode = mode
