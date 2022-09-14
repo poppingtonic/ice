@@ -6,7 +6,6 @@ services:
       OPENAI_API_KEY: ${OPENAI_API_KEY:-}
       OPENAI_ORG_ID: ${OPENAI_ORG_ID:-}
       ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY:-}
-      APP_ENV: ${APP_ENV}
       CODESPACE_NAME: ${CODESPACE_NAME:-}
     build:
       context: .

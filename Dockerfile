@@ -38,10 +38,7 @@ ENV PYTHON_VERSION="3.10.4"
 RUN pyenv install ${PYTHON_VERSION}
 RUN pyenv global ${PYTHON_VERSION}
 
-ARG APP_ENV
-
 ENV \
-  APP_ENV=${APP_ENV} \
   PIP_DEFAULT_TIMEOUT=100 \
   PIP_DISABLE_PIP_VERSION_CHECK=on \
   PIP_NO_CACHE_DIR=off \
@@ -57,7 +54,7 @@ RUN git config --global --add safe.directory /code
 
 COPY poetry-requirements.txt poetry.lock pyproject.toml /code/
 RUN pip install -r poetry-requirements.txt
-RUN poetry install $(test "$APP_ENV" = production && echo "--no-dev") --no-interaction --no-ansi --no-cache \
+RUN poetry install --no-interaction --no-ansi --no-cache \
   && rm -rf /root/.cache/pypoetry
 
 ENV VIRTUAL_ENV=/code/.venv
