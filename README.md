@@ -62,13 +62,7 @@ A convenient way to develop ICE is to use GitHub codespaces.
 
 ### Setup
 
-1. Add required secrets to `.env`. If you are using Codespaces, you can skip this step, as the required secrets will already be in your environment:
-
-   ```sh
-   echo 'OPENAI_API_KEY="sk-Aes1...L"' >> .env
-   echo 'OPENAI_ORG_ID="org-5p0N...X"' >> .env
-   echo 'OUGHT_INFERENCE_API_KEY="fe7...6"' >> .env
-   ```
+1. Add required secrets to `.env`. See `.env.example` for a model.
 
 1. Install the frontend dependencies:
 
