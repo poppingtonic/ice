@@ -29,7 +29,7 @@ class OpenAIAgent(Agent):
         self,
         *,
         prompt: str,
-        multiline: bool = False,
+        multiline: bool = True,
         verbose: bool = False,
         default: str = "",
         max_tokens: int = 256,
