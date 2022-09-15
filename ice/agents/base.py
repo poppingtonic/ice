@@ -37,5 +37,5 @@ class Agent(TracedABC):
         choices: tuple[str, ...],
         default: str | None = None,
         verbose: bool = False,
-    ) -> tuple[str, float, str | None]:
+    ) -> tuple[dict[str, float], str | None]:
         raise NotImplementedError

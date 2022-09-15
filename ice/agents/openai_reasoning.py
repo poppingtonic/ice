@@ -46,7 +46,7 @@ class OpenAIReasoningAgent(Agent):
         choices: tuple[str, ...],
         default: str | None = None,
         verbose: bool = False,
-    ) -> tuple[str, float, str | None]:
+    ) -> tuple[dict[str, float], str | None]:
         # Generate the prompt for the reasoning task
         reasoning_prompt = self._generate_reasoning_prompt(prompt)
 
@@ -58,7 +58,7 @@ class OpenAIReasoningAgent(Agent):
             reasoning_prompt, response
         )
 
-        # Return the most common answer, its probability, and the joined reasonings
+        # Return a dict [str, float] and the joined reasonings
         return self._format_result(answers, reasonings)
 
     def _generate_reasoning_prompt(self, prompt: str) -> str:
@@ -159,17 +159,20 @@ class OpenAIReasoningAgent(Agent):
 
     def _format_result(
         self, answers: Counter[str], reasonings: list[str]
-    ) -> tuple[str, float, str | None]:
-        # Get the most common answer and its count
-        most_common_answer, most_common_count = answers.most_common(1)[0]
-
-        # Calculate the probability of the most common answer
-        most_common_answer_prob = (most_common_count + 1) / (len(reasonings) + 2)
+    ) -> tuple[dict[str, float], str]:
 
         # Join the reasonings with counts
         joined_reasonings = self._join_texts_with_counts(reasonings)
 
-        return most_common_answer, most_common_answer_prob, joined_reasonings
+        # Convert the answers counter to a dictionary of probabilities
+        total = sum(answers.values())
+        answer_probs = {k: v / total for k, v in answers.items()}
+
+        # Sort the dictionary by descending probability
+        answer_probs = dict(
+            sorted(answer_probs.items(), key=lambda x: x[1], reverse=True)
+        )
+        return answer_probs, joined_reasonings
 
     def _join_texts_with_counts(self, texts: list[str]) -> str:
         """

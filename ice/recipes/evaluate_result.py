@@ -2,6 +2,7 @@ from pydantic import BaseModel
 from structlog.stdlib import get_logger
 
 from ice.recipe import Recipe
+from ice.utils import max_by_value
 
 log = get_logger()
 
@@ -171,9 +172,11 @@ class EvaluateResult(Recipe):
             model_result=model_result,
             gold_result=gold_result,
         )
-        choice, score, _ = await self.agent("instruct").classify(
+        choice_probs, _ = await self.agent("instruct").classify(
             prompt=classification_prompt, choices=(" Yes", " No")
         )
+
+        choice, score = max_by_value(choice_probs)
 
         choice = choice.strip()
 

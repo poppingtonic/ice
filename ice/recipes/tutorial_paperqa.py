@@ -14,11 +14,11 @@ Answer:"""
 
 class PaperQA(Recipe):
     async def classify_paragraph(self, paragraph: Paragraph, question: str) -> float:
-        choice, choice_prob, _ = await self.agent().classify(
+        choice_probs, _ = await self.agent().classify(
             prompt=make_classification_prompt(paragraph, question),
             choices=(" Yes", " No"),
         )
-        return choice_prob if choice == " Yes" else 1 - choice_prob
+        return choice_probs.get(" Yes", 0.0)
 
     async def get_relevant_paragraphs(
         self, paper: Paper, question: str, top_n: int = 3

@@ -31,7 +31,7 @@ class TFew(Agent):
         choices: tuple[str, ...],
         default: str | None = None,
         verbose: bool = False
-    ) -> tuple[str, float, str | None]:
+    ) -> tuple[dict[str, float], str | None]:
         inp = PromptedClassificationInput(prompt=prompt, choices=choices)
 
         def run_batch() -> PromptedClassificationOutput:
@@ -39,4 +39,5 @@ class TFew(Agent):
 
         output = await run_sync(run_batch)
 
-        return output.prediction, output.prob, None
+        # FIXME: Return full dict of probabilities
+        return {output.prediction: output.prob}, None

@@ -20,6 +20,7 @@ from ice.paper import split_sentences
 from ice.recipe import Recipe
 from ice.utils import filter_async
 from ice.utils import map_async
+from ice.utils import max_by_value
 
 from ..trace import recorder
 from ..trace import trace
@@ -810,9 +811,10 @@ class AdherenceParagraphTfew(Recipe):
         for prompt, choice_inputs in make_multiple_adherence_prompts(
             context=context, section=section, sentence=sentence
         ):
-            choice, _, _ = await self.agent(self.s.qa_model).classify(
+            choice_probs, _ = await self.agent(self.s.qa_model).classify(
                 prompt=prompt, choices=choice_inputs
             )
+            choice, _ = max_by_value(choice_probs)
             if choice == choice_inputs[1]:
                 return True
         return False

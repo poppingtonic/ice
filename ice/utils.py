@@ -331,3 +331,14 @@ def token_bucket(n, t):
         return inner
 
     return wrapper
+
+
+K = TypeVar("K")  # key type
+
+V = TypeVar("V")  # value type
+
+
+def max_by_value(
+    d: dict[K, V], *, key: Callable[[V], Any] = lambda x: x
+) -> tuple[K, V]:
+    return max(d.items(), key=lambda x: key(x[1]))

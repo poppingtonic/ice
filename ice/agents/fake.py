@@ -33,8 +33,12 @@ class FakeAgent(Agent):
         choices: tuple[str, ...],
         default: str | None = None,
         verbose: bool = False,
-    ) -> tuple[str, float, str | None]:
-        return random.choice(choices), random.random(), None
+    ) -> tuple[dict[str, float], str | None]:
+        probs = [random.random() for _ in choices]
+        total = sum(probs)
+        probs = [p / total for p in probs]
+        distribution = dict(zip(choices, probs))
+        return distribution, None
 
     async def predict(
         self, *, context: str, default: str = "", verbose: bool = False

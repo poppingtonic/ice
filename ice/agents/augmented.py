@@ -1,5 +1,6 @@
 from ice.agents.base import Agent
 from ice.environment import env
+from ice.utils import max_by_value
 from ice.utils import quoted
 
 
@@ -61,13 +62,14 @@ class AugmentedAgent(Agent):
         choices: tuple[str, ...],
         default: str | None = None,
         verbose: bool = False,
-    ) -> tuple[str, float, str | None]:
-        (machine_choice, machine_prob, explanation,) = await self.machine.classify(
+    ) -> tuple[dict[str, float], str | None]:
+        (machine_probs, explanation) = await self.machine.classify(
             prompt=prompt,
             choices=choices,
             default=default,
             verbose=verbose,
         )
+        machine_choice, _ = max_by_value(machine_probs)
         if explanation is not None:
             # TODO: Should present this to the human in a way that does
             #       not circumvent agent abstraction
@@ -75,15 +77,11 @@ class AugmentedAgent(Agent):
                 f"""
 #### classify
 
-Machine choice:
+Machine choice probs:
 
-{quoted(machine_choice)}
+{machine_probs}
 
-Probability of machine choice:
-
-> {machine_prob:.2f}
-
-Explanation for machine choice:
+Explanation for machine probs:
 
 {quoted(explanation)}""",
                 format_markdown=True,
