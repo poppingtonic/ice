@@ -19,12 +19,11 @@ class CachedAgent(Agent):
         self,
         *,
         prompt,
-        multiline=False,
+        multiline=True,
         verbose=False,
         default="",
         max_tokens: int = 256,
     ) -> str:
-        # TODO: add multiline and max_tokens to the prompt
         key = get_cache_key("answer", prompt)
         if key in self.cache:
             return self.cache[key]

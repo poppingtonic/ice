@@ -50,7 +50,7 @@ class EnvironmentInterface(abc.ABC):
     async def checkboxes(self, prompt: str, choices: list[str]) -> list[str]:
         raise NotImplementedError
 
-    async def answer(self, prompt: str, default: str, multiline: bool = False) -> str:
+    async def answer(self, prompt: str, default: str, multiline: bool = True) -> str:
         raise NotImplementedError
 
     async def score(
@@ -127,7 +127,7 @@ class CliEnvironment(EnvironmentInterface):
             raise ValueError("No selections provided")
         return cast(list[str], selections)
 
-    async def answer(self, prompt: str, default: str, multiline: bool = False) -> str:
+    async def answer(self, prompt: str, default: str, multiline: bool = True) -> str:
         question = self._maybe_print_prompt(prompt)
         answer = questionary.text(question, default=default, multiline=multiline).ask()
         if answer is None:
