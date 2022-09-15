@@ -3,6 +3,7 @@ import asyncio
 from abc import abstractmethod
 from collections.abc import Callable
 from functools import wraps
+from inspect import iscoroutinefunction
 from pathlib import Path
 from typing import final
 from typing import Generic
@@ -92,6 +93,9 @@ class RecipeHelper:
         self._mode: Mode | None = "machine"
 
     def main(self, main):
+        if not iscoroutinefunction(main):
+            raise TypeError("@recipe.main must be applied to an async function")
+
         # Trace all globals defined in main's module.
         g = main.__globals__
         for name, value in g.items():
