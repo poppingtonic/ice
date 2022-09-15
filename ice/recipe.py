@@ -5,6 +5,8 @@ from collections.abc import Callable
 from functools import wraps
 from inspect import iscoroutinefunction
 from pathlib import Path
+import sys
+from traceback import print_exc
 from typing import final
 from typing import Generic
 from typing import no_type_check
@@ -110,7 +112,16 @@ class RecipeHelper:
         @trace
         @wraps(main)
         async def hidden_wrapper(*args, **kwargs):
-            result = await trace(main)(*args, **kwargs)
+            try:
+                result = await trace(main)(*args, **kwargs)
+            except NameError:
+                print_exc()
+                print(
+                    "\nReminder: @recipe.main should be at the bottom of the file",
+                    file=sys.stderr,
+                )
+                sys.exit(1)
+
             env().print(result, format_markdown=False)
             return result
 
