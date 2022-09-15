@@ -1,11 +1,13 @@
 import asyncio
+import sys
 
 from abc import abstractmethod
 from collections.abc import Callable
 from functools import wraps
 from inspect import iscoroutinefunction
+from inspect import Parameter
+from inspect import signature
 from pathlib import Path
-import sys
 from traceback import print_exc
 from typing import final
 from typing import Generic
@@ -97,6 +99,14 @@ class RecipeHelper:
     def main(self, main):
         if not iscoroutinefunction(main):
             raise TypeError("@recipe.main must be applied to an async function")
+
+        if not all(
+            p.kind == Parameter.KEYWORD_ONLY
+            for p in signature(main).parameters.values()
+        ):
+            raise TypeError(
+                "@recipe.main must be applied to a function with only keyword arguments"
+            )
 
         # Trace all globals defined in main's module.
         g = main.__globals__
