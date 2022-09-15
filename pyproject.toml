@@ -5,6 +5,7 @@ description = ""
 authors = ["Ought <team@ought.org>"]
 
 [tool.poetry.dependencies]
+python = "~3.10"
 defopt = "^6.3.0"
 questionary = "^1.10.0"
 rich = "^12.4.1"
