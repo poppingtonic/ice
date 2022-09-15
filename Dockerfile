@@ -23,4 +23,4 @@ RUN (cd ui && npm ci)
 
 COPY . .
 
-CMD ["concurrently", "uvicorn ice.web:app --host 0.0.0.0 --port 8000 --reload", "cd ui && npm run dev"]
+CMD ["concurrently", "sleep infinity", "cd ui && npm run dev"]
