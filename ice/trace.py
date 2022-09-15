@@ -72,7 +72,12 @@ class JSONEncoder(json.JSONEncoder):
             return o.dict()
         if isfunction(o):
             return dict(class_name=o.__class__.__name__, name=o.__name__)
-        return json.JSONEncoder.default(self, o)
+        try:
+            value = json.JSONEncoder.default(self, o)
+        except TypeError:
+            value = str(o)
+            log.warning("Couldn't serialize, using string representation", value=value)
+        return value
 
 
 def compress_arg(k: str, v):
