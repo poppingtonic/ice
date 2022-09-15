@@ -75,8 +75,7 @@ class JSONEncoder(json.JSONEncoder):
         try:
             value = json.JSONEncoder.default(self, o)
         except TypeError:
-            value = str(o)
-            log.warning("Couldn't serialize, using string representation", value=value)
+            value = repr(o)
         return value
 
 
