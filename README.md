@@ -109,31 +109,31 @@ To use anthropic models (agents), you must add a valid `ANTHROPIC_API_KEY` to yo
 Human without GPT default completions:
 
 ```sh
-./scripts/run-recipe.sh -m human
+./scripts/run-recipe.sh --mode human
 ```
 
 Human with GPT default completions:
 
 ```sh
-./scripts/run-recipe.sh -m augmented
+./scripts/run-recipe.sh --mode augmented
 ```
 
 #### GPT
 
 ```sh
-./scripts/run-recipe.sh -m machine
+./scripts/run-recipe.sh --mode machine
 ```
 
 You can run on the iteration gold standards of a specific recipe like
 
 ```sh
-./scripts/run-recipe.sh -m machine -r placebotree -q placebo -g iterate
+./scripts/run-recipe.sh --mode machine -r placebotree -q placebo -g iterate
 ```
 
 To run over multiple gold standard splits, just provide them separated by spaces:
 
 ```sh
-scripts/run-recipe.sh -m machine -r placebotree -q placebo -g iterate validation
+scripts/run-recipe.sh --mode machine -r placebotree -q placebo -g iterate validation
 ```
 
 ### Streamlit
@@ -170,7 +170,7 @@ This will generate the same sort of eval as for ICE recipes.
 Cheap integration tests:
 
 ```sh
-./scripts/run-recipe.sh -m test
+./scripts/run-recipe.sh --mode test
 ```
 
 Unit tests:

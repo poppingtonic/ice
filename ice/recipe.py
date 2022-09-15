@@ -1,9 +1,14 @@
 import asyncio
+import sys
 
 from abc import abstractmethod
 from collections.abc import Callable
 from functools import wraps
+from inspect import iscoroutinefunction
+from inspect import Parameter
+from inspect import signature
 from pathlib import Path
+from traceback import print_exc
 from typing import final
 from typing import Generic
 from typing import no_type_check
@@ -92,6 +97,17 @@ class RecipeHelper:
         self._mode: Mode | None = "machine"
 
     def main(self, main):
+        if not iscoroutinefunction(main):
+            raise TypeError("@recipe.main must be applied to an async function")
+
+        if not all(
+            p.kind == Parameter.KEYWORD_ONLY
+            for p in signature(main).parameters.values()
+        ):
+            raise TypeError(
+                "@recipe.main must be applied to a function with only keyword arguments"
+            )
+
         # Trace all globals defined in main's module.
         g = main.__globals__
         for name, value in g.items():
@@ -106,7 +122,16 @@ class RecipeHelper:
         @trace
         @wraps(main)
         async def hidden_wrapper(*args, **kwargs):
-            result = await trace(main)(*args, **kwargs)
+            try:
+                result = await trace(main)(*args, **kwargs)
+            except NameError:
+                print_exc()
+                print(
+                    "\nReminder: @recipe.main should be at the bottom of the file",
+                    file=sys.stderr,
+                )
+                sys.exit(1)
+
             env().print(result, format_markdown=False)
             return result
 
@@ -127,7 +152,7 @@ class RecipeHelper:
                 enable_trace()
             asyncio.run(untraced_wrapper(*args, **kwargs))
 
-        defopt.run(cli, parsers={Paper: lambda path: Paper.load(Path(path))})
+        defopt.run(cli, short={}, parsers={Paper: lambda path: Paper.load(Path(path))})
 
     def agent(self, agent_name: str | None = None) -> Agent:
         assert self._mode
