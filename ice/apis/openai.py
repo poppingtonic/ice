@@ -10,15 +10,8 @@ from tenacity.wait import wait_random_exponential
 
 from ice.cache import diskcache
 from ice.settings import settings
-from ice.utils import ProactiveRateLimitError
-from ice.utils import token_bucket
 
 log = get_logger()
-
-
-@token_bucket(1, 6)
-async def wait_before_alpha():
-    return
 
 
 class RateLimitError(Exception):
@@ -54,15 +47,12 @@ def is_retryable_HttpError(e: BaseException) -> bool:
         retry_if_exception(is_retryable_HttpError),
         retry_if_exception_type(TimeoutException),
         retry_if_exception_type(RateLimitError),
-        retry_if_exception_type(ProactiveRateLimitError),
     ),
     wait=wait_random_exponential(min=1),
     after=log_attempt_number,
 )
 async def _post(endpoint: str, json: dict, timeout: float | None = None) -> dict:
     """Send a POST request to the OpenAI API and return the JSON response."""
-    if "alpha" in json.get("model", "").lower():
-        await wait_before_alpha()
 
     async with httpx.AsyncClient() as client:
         response = await client.post(
