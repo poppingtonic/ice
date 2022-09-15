@@ -2,7 +2,7 @@ import Link from "next/link";
 
 const recipes = [
   {
-    link: "/traces/01GBRXAEQSSX9M6MR9JJAY454V",
+    link: "/traces/01GCZNZ1YC0XRE1QHSAV6MPWJD",
     title: "Placebo classification and description",
     description: "Did this paper use a placebo? If so, what was it?",
   },
