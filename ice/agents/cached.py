@@ -22,7 +22,7 @@ class CachedAgent(Agent):
         multiline=False,
         verbose=False,
         default="",
-        max_tokens: int | None = None,
+        max_tokens: int = 256,
     ) -> str:
         # TODO: add multiline and max_tokens to the prompt
         key = get_cache_key("answer", prompt)

@@ -32,7 +32,7 @@ class OpenAIAgent(Agent):
         multiline: bool = False,
         verbose: bool = False,
         default: str = "",
-        max_tokens: int | None = None,
+        max_tokens: int = 256,
     ) -> str:
         """Generate an answer to a question given some context."""
         if verbose:
