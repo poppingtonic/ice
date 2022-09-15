@@ -1,4 +1,3 @@
-import functools
 import itertools
 import os
 import threading as td
@@ -299,38 +298,6 @@ def window_by_tokens(text: str, *, max_tokens: int = 7000):
     max_chars = int(max_tokens * 3.5)
     for i in range(0, chars, max_chars):
         yield text[i : i + max_chars]
-
-
-class ProactiveRateLimitError(Exception):
-    pass
-
-
-def token_bucket(n, t):
-    bucket = n
-    last_refill = time.time()
-    lock = td.Lock()
-
-    def wrapper(func):
-        @functools.wraps(func)
-        async def inner(*args, **kwargs):
-            nonlocal bucket
-            nonlocal last_refill
-            lock.acquire()
-            now = time.time()
-            elapsed = now - last_refill
-            bucket = min(n, bucket + elapsed * n / t)
-            last_refill = now
-            if bucket >= 1:
-                bucket -= 1
-                lock.release()
-                return await func(*args, **kwargs)
-            else:
-                lock.release()
-                raise ProactiveRateLimitError("Too many function calls, please wait")
-
-        return inner
-
-    return wrapper
 
 
 K = TypeVar("K")  # key type

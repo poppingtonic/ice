@@ -27,10 +27,10 @@ class OpenAIReasoningAgent(Agent):
         self,
         *,
         prompt: str,
-        multiline: bool = False,
+        multiline: bool = True,
         verbose: bool = False,
         default: str = "",
-        max_tokens: int | None = None,
+        max_tokens: int = 256,
     ) -> str:
         # TODO: implement this method
         raise NotImplementedError
