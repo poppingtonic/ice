@@ -10,7 +10,7 @@ class HumanAgent(Agent):
         multiline: bool = False,
         verbose: bool = False,
         default: str = "",
-        max_tokens: int | None = None,
+        max_tokens: int = 256,
     ) -> str:
         verbose  # ignored for HumanAgent
         completion = await env().answer(prompt, default=default, multiline=multiline)
