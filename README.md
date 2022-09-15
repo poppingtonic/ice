@@ -39,13 +39,7 @@ Decomposition of paper Q&A using humans and language models
 
 ### Setup
 
-1. Add required secrets to `.env`.
-
-   ```sh
-   echo 'OPENAI_API_KEY="sk-Aes1...L"' >> .env
-   echo 'OPENAI_ORG_ID="org-5p0N...X"' >> .env
-   echo 'OUGHT_INFERENCE_API_KEY="fe7...6"' >> .env
-   ```
+1. Add required secrets to `.env`. See `.env.example` for a model.
 
 1. Build and run the container:
 
