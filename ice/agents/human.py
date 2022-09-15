@@ -37,8 +37,8 @@ class HumanAgent(Agent):
         choices: tuple[str, ...],
         default: str | None = None,
         verbose: bool = False,
-    ) -> tuple[str, float, str | None]:
+    ) -> tuple[dict[str, float], str | None]:
         choice = await env().select(
             prompt=prompt, choices=list(choices), default=default
         )
-        return choice, 1.0, None
+        return {choice: 1.0}, None

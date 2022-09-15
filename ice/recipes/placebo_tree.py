@@ -14,6 +14,7 @@ from ice.recipe import Recipe
 from ice.recipes.comparisons_qa import ComparisonsQA
 from ice.recipes.experiment_arms import ExperimentArms
 from ice.utils import map_async
+from ice.utils import max_by_value
 
 Experiment = str
 
@@ -533,13 +534,14 @@ Answer:"""
         verbose: bool = False,
         agent_name: str = "instruct-reasoning-crowd",
     ) -> ClassificationComponent:
-        answer, probability, explanations = await self.agent(
+        answer_probs, explanations = await self.agent(
             agent_name="instruct-reasoning-crowd"
         ).classify(
             prompt=prompt,
             choices=tuple(choices),
             verbose=verbose,
         )
+        answer, probability = max_by_value(answer_probs)
         if probability < unknown_threshold:
             answer = unknown_choice
             probability = 0.9

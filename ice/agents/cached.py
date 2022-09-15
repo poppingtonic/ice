@@ -55,7 +55,7 @@ class CachedAgent(Agent):
         choices: tuple[str, ...],
         default: str | None = None,
         verbose: bool = False,
-    ) -> tuple[str, float, str | None]:
+    ) -> tuple[dict[str, float], str | None]:
         key = get_cache_key("classify", prompt)
         if key in self.cache:
             return self.cache[key]

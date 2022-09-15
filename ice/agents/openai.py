@@ -61,7 +61,7 @@ class OpenAIAgent(Agent):
         choices: tuple[str, ...],
         default: str | None = None,
         verbose: bool = False,
-    ) -> tuple[str, float, str | None]:
+    ) -> tuple[dict[str, float], str | None]:
         """Generate a classification from a list of choices given some context and a question."""
         if verbose:
             self._print_markdown(prompt)
@@ -80,12 +80,10 @@ class OpenAIAgent(Agent):
 
         rel_probs = self._compute_relative_probs(choices, choice_prefix, prediction)
 
-        most_likely_choice = max(choices, key=lambda choice: rel_probs[choice])
-
         if verbose:
-            self._print_markdown(most_likely_choice)
+            self._print_markdown(rel_probs)
 
-        return most_likely_choice, rel_probs[most_likely_choice], None
+        return rel_probs, None
 
     async def _complete(self, prompt, **kwargs) -> dict:
         """Send a completion request to the OpenAI API with the given prompt and parameters."""
