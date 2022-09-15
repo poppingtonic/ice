@@ -31,38 +31,15 @@ Decomposition of paper Q&A using humans and language models
 
 - The **mode** in which a recipe runs is a global setting that can affect every agent call. For instance, whether to use humans or agents. Recipes can also run with certain `RecipeSettings`, which can map a task type to a specific `agent_name`, which can modify which agent is used for that specfic type of task.
 
-## Running ICE with Codespaces
-
-A convenient way to develop ICE is to use GitHub codespaces.
-
-1. Increase the default idle timeout in [your settings](https://github.com/settings/codespaces#default-idle-timeout-header) from 30 minutes to a few hours.
-1. Go [here](https://github.com/oughtinc/ice/codespaces) to create a new codespace.
-1. Install the frontend dependencies:
-
-   ```sh
-   (cd ui; npm ci)
-   ```
-
-1. Start ICE in its own terminal and leave it running:
-
-   ```sh
-   scripts/run-local.sh
-   ```
-
-1. Go through [the tutorial](https://oughtinc.github.io/ice/) or follow the [instructions to running a recipe](#running-ice-on-the-command-line).
-
-1. To share your visualizations publicly, on the ports pane (F1 to open the command palette -> "Ports: Focus on Ports View"), change port 3000 to be public (Right Click -> Port Visibility -> Public), and click the 🌐 icon in the "Local Address" field to get the link.
-
 ## Running ICE locally
 
 ### Requirements
 
-1. [Docker Desktop](https://www.docker.com/products/docker-desktop/) to run the containerized python application.
-2. Node to run the composition visualization tool. Node can be installed via [nvm](https://github.com/nvm-sh/nvm). Install `nvm`, then `cd ui && nvm use && npm install`.
+1. [Docker Desktop](https://www.docker.com/products/docker-desktop/) to run the container.
 
 ### Setup
 
-1. Add required secrets to `.env`. If you are using Codespaces, you can skip this step, as the required secrets will already be in your environment:
+1. Add required secrets to `.env`.
 
    ```sh
    echo 'OPENAI_API_KEY="sk-Aes1...L"' >> .env
@@ -70,16 +47,10 @@ A convenient way to develop ICE is to use GitHub codespaces.
    echo 'OUGHT_INFERENCE_API_KEY="fe7...6"' >> .env
    ```
 
-1. Install the frontend dependencies:
+1. Build and run the container:
 
    ```sh
-   (cd ui; npm ci)
-   ```
-
-1. Start ICE in its own terminal and leave it running:
-
-   ```sh
-   scripts/run-local.sh
+   docker compose build && docker compose up
    ```
 
 1. Go through [the tutorial](https://oughtinc.github.io/ice/) or follow the [instructions to running a recipe](#running-ice-on-the-command-line).
