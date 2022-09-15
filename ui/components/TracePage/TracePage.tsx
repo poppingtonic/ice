@@ -11,6 +11,7 @@ import classNames from "classnames";
 import produce from "immer";
 import { isEmpty, last, omit, set } from "lodash";
 import { useRouter } from "next/router";
+import { CaretDown, CaretRight, ChatCenteredDots } from "phosphor-react";
 import {
   createContext,
   Dispatch,
@@ -225,63 +226,57 @@ const useLinks = () => {
   return { getParent, getChildren, getPrior: getSiblingAt(-1), getNext: getSiblingAt(1) };
 };
 
-const Name = ({ id }: { id: string }) => {
-  const { name, args } = useCallInfo(id);
-  const recipeClassName = (args as any).self?.class_name;
-  return (
-    <span>
-      {(name === "execute" || name === "run") && recipeClassName
-        ? "📋 " + recipeClassName
-        : MODEL_CALL_NAMES.includes(name)
-        ? "🕵 " + name
-        : "💻 " + name}
-    </span>
-  );
+const CallName = ({ className, id }: { className?: string; id: string }) => {
+  const { name } = useCallInfo(id);
+  const spacedName = name.replace(/_/g, " ");
+  const capitalizedAndSpacedName = spacedName[0].toUpperCase() + spacedName.slice(1);
+  return <span className={className}>{capitalizedAndSpacedName}</span>;
 };
 
 const Call = ({ id }: { id: string }) => {
-  const { args, children = {}, result, select, selected } = useCallInfo(id);
+  const { name, args, children = {}, result, select, selected } = useCallInfo(id);
   const childIds = Object.keys(children);
   const { expanded, setExpanded } = useExpanded(id);
 
-  const selectedBg = useColorModeValue("gray.100", "gray.700");
-  const unselectedBg = useColorModeValue("transparent", "transparent");
+  const isModelCall = MODEL_CALL_NAMES.includes(name);
 
   return (
     <div className="mt-2 flex-shrink-0">
       <div className="flex flex-shrink-0">
-        {childIds.length ? (
-          <IconButton
-            aria-label={expanded ? "Collapse" : "Expand"}
-            className="justify-center mx-1 flex-shrink-0 !shadow-none"
-            icon={<ChevronRightIcon className={classNames({ "rotate-90": expanded })} />}
-            size="s"
-            variant="ghost"
-            onClick={() => setExpanded(!expanded)}
-            w="8"
-          />
-        ) : (
-          <div className="mx-1 w-8" />
-        )}
         <Button
-          className="flex items-center flex-shrink-0 !shadow-none"
-          size="s"
+          className="justify-start text-start items-start h-fit min-w-[300px] p-1.5"
           variant="ghost"
           onClick={select}
-          bg={selected ? selectedBg : unselectedBg}
+          isActive={selected}
           px="2"
           py="1"
         >
-          <Name id={id} />
-          <span className="pl-2 text-s text-gray-600 flex items-center">
-            <span className="text-green-700">{getShortString(args)}</span>
-            <span className="px-1">→</span>
-            {result === undefined ? (
-              <Spinner size="small" />
-            ) : (
-              <span className="text-blue-600">{getShortString(result)}</span>
-            )}
-          </span>
+          {childIds.length > 0 && (
+            <Button
+              aria-label={expanded ? "Collapse" : "Expand"}
+              className="rounded-full p-1 h-fit mr-3"
+              leftIcon={expanded ? <CaretDown /> : <CaretRight />}
+              rightIcon={isModelCall ? <ChatCenteredDots /> : undefined}
+              size="md"
+              isActive={expanded}
+              variant="outline"
+              onClick={() => setExpanded(!expanded)}
+            >
+              <span className={classNames(!isModelCall && "mr-1")}>{childIds.length}</span>
+            </Button>
+          )}
+          <div>
+            <CallName className="text-base text-slate-700" id={id} />
+            <div className="text-sm text-gray-600 flex items-center">
+              <span className="text-indigo-600">{getShortString(args)}</span>
+              <span className="px-2">→</span>
+              {result === undefined ? (
+                <Spinner size="small" />
+              ) : (
+                <span className="text-lightBlue-600">{getShortString(result)}</span>
+              )}
+            </div>
+          </div>
         </Button>
       </div>
       <Collapse in={expanded} transition={{ enter: { duration: 0 } }}>
@@ -393,7 +388,7 @@ const DetailPaneContent = ({ info }: DetailPaneContentProps) => {
 const TabHeader = ({ id, doc }: { id: string; doc: string }) => (
   <div className="mb-4">
     <h3 className="text-lg font-semibold text-gray-800">
-      <Name id={id} />
+      <CallName id={id} />
     </h3>
     <p className="text-gray-600 text-sm">{doc}</p>
   </div>
