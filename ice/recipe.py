@@ -142,7 +142,7 @@ class RecipeHelper:
                 enable_trace()
             asyncio.run(untraced_wrapper(*args, **kwargs))
 
-        defopt.run(cli, parsers={Paper: lambda path: Paper.load(Path(path))})
+        defopt.run(cli, short={}, parsers={Paper: lambda path: Paper.load(Path(path))})
 
     def agent(self, agent_name: str | None = None) -> Agent:
         assert self._mode
