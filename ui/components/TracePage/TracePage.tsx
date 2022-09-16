@@ -290,17 +290,20 @@ const Call = ({ id, refreshArcherArrows }: { id: string; refreshArcherArrows: ()
             {childIds.length > 0 ? (
               <Button
                 aria-label={expanded ? "Collapse" : "Expand"}
-                className="rounded-full p-1 h-fit mr-2 !shadow-none"
+                className={classNames(
+                  "rounded-full p-1 h-fit mr-2 !shadow-none hover:bg-slate-200",
+                )}
                 leftIcon={isModelCall ? undefined : expanded ? <CaretDown /> : <CaretRight />}
                 rightIcon={isModelCall ? <ChatCenteredDots /> : undefined}
                 size="md"
                 isActive={expanded}
                 variant="outline"
-                onClick={() => {
+                onClick={event => {
                   setExpanded(!expanded);
                   // Theres a hard to debug layout thing here, where sometimes
                   // the arrows don't redraw properly when nodes are expanded.
                   setTimeout(() => refreshArcherArrows(), 50);
+                  event.stopPropagation();
                 }}
               >
                 {<span className={classNames(!isModelCall && "mr-1")}>{childIds.length}</span>}
