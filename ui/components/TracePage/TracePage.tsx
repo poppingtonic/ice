@@ -68,6 +68,7 @@ const TreeContext = createContext<{
   setSelectedId: Dispatch<SetStateAction<string | undefined>>;
   getExpanded: (id: string) => boolean;
   setExpanded: (id: string, expanded: boolean) => void;
+  getFocussed: (id: string) => boolean;
 } | null>(null);
 
 const applyUpdates = (calls: Calls, updates: Record<string, unknown>) =>
@@ -143,6 +144,23 @@ const TreeProvider = ({ traceId, children }: { traceId: string; children: ReactN
     };
   }, [traceId]);
 
+  const getFocussed = useMemo(() => {
+    const selectedCall = selectedId !== undefined ? calls[selectedId] : undefined;
+    if (!selectedCall) {
+      return () => true;
+    }
+    // Two levels up from the selected call
+    const focusRootId = calls[selectedCall.parent]?.parent ?? selectedCall.parent ?? selectedId;
+    const focussedIds = [
+      focusRootId,
+      ...Object.keys(calls[focusRootId]?.children ?? {}).flatMap(nodeId => {
+        const node = calls[nodeId];
+        return [nodeId, ...Object.keys(node.children ?? {})];
+      }),
+    ];
+    return (id: string) => focussedIds.includes(id);
+  }, [selectedId, calls]);
+
   return (
     <TreeContext.Provider
       value={{
@@ -153,6 +171,7 @@ const TreeProvider = ({ traceId, children }: { traceId: string; children: ReactN
         getExpanded: (id: string) => expandedById[id] ?? false,
         setExpanded: (id: string, expanded: boolean) =>
           setExpandedById(current => ({ ...current, [id]: expanded })),
+        getFocussed,
       }}
     >
       {children}
@@ -167,8 +186,13 @@ const useTreeContext = () => {
 };
 
 const useCallInfo = (id: string) => {
-  const { calls, selectedId, setSelectedId } = useTreeContext();
-  return { ...calls[id], selected: selectedId === id, select: () => setSelectedId(id) };
+  const { calls, selectedId, setSelectedId, getFocussed } = useTreeContext();
+  return {
+    ...calls[id],
+    selected: selectedId === id,
+    focussed: getFocussed(id),
+    select: () => setSelectedId(id),
+  };
 };
 
 type SelectedCallInfo = {
@@ -232,7 +256,7 @@ function lineAnchorId(id: string) {
 }
 
 const Call = ({ id, refreshArcherArrows }: { id: string; refreshArcherArrows: () => void }) => {
-  const { name, args, children = {}, result, select, selected } = useCallInfo(id);
+  const { name, args, children = {}, result, select, selected, focussed } = useCallInfo(id);
   const childIds = Object.keys(children);
   const { expanded, setExpanded } = useExpanded(id);
 
@@ -240,7 +264,7 @@ const Call = ({ id, refreshArcherArrows }: { id: string; refreshArcherArrows: ()
 
   return (
     <div className="mt-2 flex-shrink-0">
-      <div className="flex flex-shrink-0">
+      <div className={classNames("flex flex-shrink-0", !focussed && "opacity-30")}>
         <Button
           className="justify-start text-start items-start h-fit min-w-[300px] p-1.5 !shadow-none"
           variant="ghost"
