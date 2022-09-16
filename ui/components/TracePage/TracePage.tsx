@@ -244,12 +244,10 @@ const Call = ({ id }: { id: string }) => {
     <div className="mt-2 flex-shrink-0">
       <div className="flex flex-shrink-0">
         <Button
-          className="justify-start text-start items-start h-fit min-w-[300px] p-1.5"
+          className="justify-start text-start items-start h-fit min-w-[300px] p-1.5 !shadow-none"
           variant="ghost"
           onClick={select}
           isActive={selected}
-          px="2"
-          py="1"
         >
           {childIds.length > 0 && (
             <Button
