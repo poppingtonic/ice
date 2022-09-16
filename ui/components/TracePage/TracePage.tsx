@@ -150,14 +150,12 @@ const TreeProvider = ({ traceId, children }: { traceId: string; children: ReactN
       return () => true;
     }
     // Two levels up from the selected call
-    const focusRootId = calls[selectedCall.parent]?.parent ?? selectedCall.parent ?? selectedId;
-    const focussedIds = [
-      focusRootId,
-      ...Object.keys(calls[focusRootId]?.children ?? {}).flatMap(nodeId => {
-        const node = calls[nodeId];
-        return [nodeId, ...Object.keys(node.children ?? {})];
-      }),
+    const focusRootId = selectedCall.parent ?? selectedId;
+    const getFocussedIds = (nodeId: string): string[] => [
+      nodeId,
+      ...Object.keys(calls[nodeId]?.children ?? {}).flatMap(getFocussedIds),
     ];
+    const focussedIds = getFocussedIds(focusRootId);
     return (id: string) => focussedIds.includes(id);
   }, [selectedId, calls]);
 
@@ -293,7 +291,7 @@ const Call = ({ id, refreshArcherArrows }: { id: string; refreshArcherArrows: ()
               <Button
                 aria-label={expanded ? "Collapse" : "Expand"}
                 className="rounded-full p-1 h-fit mr-2 !shadow-none"
-                leftIcon={expanded ? <CaretDown /> : <CaretRight />}
+                leftIcon={isModelCall ? undefined : expanded ? <CaretDown /> : <CaretRight />}
                 rightIcon={isModelCall ? <ChatCenteredDots /> : undefined}
                 size="md"
                 isActive={expanded}
@@ -305,7 +303,7 @@ const Call = ({ id, refreshArcherArrows }: { id: string; refreshArcherArrows: ()
                   setTimeout(() => refreshArcherArrows(), 50);
                 }}
               >
-                <span className={classNames(!isModelCall && "mr-1")}>{childIds.length}</span>
+                {<span className={classNames(!isModelCall && "mr-1")}>{childIds.length}</span>}
               </Button>
             ) : (
               <div className="mt-3 -ml-1.5 mr-1.5" id={lineAnchorId(id)}></div>
@@ -325,11 +323,13 @@ const Call = ({ id, refreshArcherArrows }: { id: string; refreshArcherArrows: ()
           </div>
         </Button>
       </div>
-      <Collapse in={expanded} transition={{ enter: { duration: 0 } }}>
-        <div className="ml-12">
-          {expanded && <CallChildren id={id} refreshArcherArrows={refreshArcherArrows} />}
-        </div>
-      </Collapse>
+      {!isModelCall && (
+        <Collapse in={expanded} transition={{ enter: { duration: 0 } }}>
+          <div className="ml-12">
+            {expanded && <CallChildren id={id} refreshArcherArrows={refreshArcherArrows} />}
+          </div>
+        </Collapse>
+      )}
     </div>
   );
 };
