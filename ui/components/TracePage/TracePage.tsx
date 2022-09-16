@@ -245,8 +245,11 @@ const useLinks = () => {
 };
 
 const CallName = ({ className, id }: { className?: string; id: string }) => {
-  const { name } = useCallInfo(id);
-  const spacedName = name.replace(/_/g, " ");
+  const { name, args } = useCallInfo(id);
+  const recipeClassName = (args as any).self?.class_name;
+  const displayName =
+    (name === "execute" || name === "run") && recipeClassName ? recipeClassName : name;
+  const spacedName = displayName.replace(/_/g, " ");
   const capitalizedAndSpacedName = spacedName[0].toUpperCase() + spacedName.slice(1);
   return <span className={className}>{capitalizedAndSpacedName}</span>;
 };
