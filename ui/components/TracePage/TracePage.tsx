@@ -280,7 +280,7 @@ const Call = ({ id }: { id: string }) => {
         </Button>
       </div>
       <Collapse in={expanded} transition={{ enter: { duration: 0 } }}>
-        <div className="ml-6">{expanded && <CallChildren id={id} />}</div>
+        <div className="ml-12">{expanded && <CallChildren id={id} />}</div>
       </Collapse>
     </div>
   );
