@@ -1,12 +1,5 @@
-import { ChevronRightIcon } from "@chakra-ui/icons";
-import {
-  Button,
-  Collapse,
-  IconButton,
-  Skeleton,
-  useColorModeValue,
-  useToast,
-} from "@chakra-ui/react";
+import { ArcherContainer, ArcherElement } from "react-archer";
+import { Button, Collapse, Skeleton, useToast } from "@chakra-ui/react";
 import classNames from "classnames";
 import produce from "immer";
 import { isEmpty, last, omit, set } from "lodash";
@@ -28,6 +21,7 @@ import { JSONTree } from "react-json-tree";
 import SyntaxHighlighter from "react-syntax-highlighter";
 import Separator from "./Separator";
 import Spinner from "./Spinner";
+import { ArcherContainerHandle } from "react-archer/lib/ArcherContainer/ArcherContainer.types";
 
 const chalkLikeStyle = {
   "hljs-keyword": { color: "rgb(45, 127, 232)" },
@@ -233,7 +227,11 @@ const CallName = ({ className, id }: { className?: string; id: string }) => {
   return <span className={className}>{capitalizedAndSpacedName}</span>;
 };
 
-const Call = ({ id }: { id: string }) => {
+function lineAnchorId(id: string) {
+  return `line-anchor-${id}`;
+}
+
+const Call = ({ id, refreshArcherArrows }: { id: string; refreshArcherArrows: () => void }) => {
   const { name, args, children = {}, result, select, selected } = useCallInfo(id);
   const childIds = Object.keys(children);
   const { expanded, setExpanded } = useExpanded(id);
@@ -249,21 +247,41 @@ const Call = ({ id }: { id: string }) => {
           onClick={select}
           isActive={selected}
         >
-          {childIds.length > 0 && (
-            <Button
-              aria-label={expanded ? "Collapse" : "Expand"}
-              className="rounded-full p-1 h-fit mr-3"
-              leftIcon={expanded ? <CaretDown /> : <CaretRight />}
-              rightIcon={isModelCall ? <ChatCenteredDots /> : undefined}
-              size="md"
-              isActive={expanded}
-              variant="outline"
-              onClick={() => setExpanded(!expanded)}
-            >
-              <span className={classNames(!isModelCall && "mr-1")}>{childIds.length}</span>
-            </Button>
-          )}
-          <div>
+          <ArcherElement
+            id={lineAnchorId(id)}
+            relations={
+              expanded
+                ? childIds.map(childId => ({
+                    targetId: lineAnchorId(childId),
+                    targetAnchor: "left",
+                    sourceAnchor: "bottom",
+                  }))
+                : []
+            }
+          >
+            {childIds.length > 0 ? (
+              <Button
+                aria-label={expanded ? "Collapse" : "Expand"}
+                className="rounded-full p-1 h-fit mr-2 !shadow-none"
+                leftIcon={expanded ? <CaretDown /> : <CaretRight />}
+                rightIcon={isModelCall ? <ChatCenteredDots /> : undefined}
+                size="md"
+                isActive={expanded}
+                variant="outline"
+                onClick={() => {
+                  setExpanded(!expanded);
+                  // Theres a hard to debug layout thing here, where sometimes
+                  // the arrows don't redraw properly when nodes are expanded.
+                  setTimeout(() => refreshArcherArrows(), 50);
+                }}
+              >
+                <span className={classNames(!isModelCall && "mr-1")}>{childIds.length}</span>
+              </Button>
+            ) : (
+              <div className="mt-3 -ml-1.5 mr-1.5" id={lineAnchorId(id)}></div>
+            )}
+          </ArcherElement>
+          <div className="mx-2">
             <CallName className="text-base text-slate-700" id={id} />
             <div className="text-sm text-gray-600 flex items-center">
               <span className="text-indigo-600">{getShortString(args)}</span>
@@ -278,20 +296,28 @@ const Call = ({ id }: { id: string }) => {
         </Button>
       </div>
       <Collapse in={expanded} transition={{ enter: { duration: 0 } }}>
-        <div className="ml-12">{expanded && <CallChildren id={id} />}</div>
+        <div className="ml-12">
+          {expanded && <CallChildren id={id} refreshArcherArrows={refreshArcherArrows} />}
+        </div>
       </Collapse>
     </div>
   );
 };
 
-const CallChildren = ({ id }: { id: string }) => {
+const CallChildren = ({
+  id,
+  refreshArcherArrows,
+}: {
+  id: string;
+  refreshArcherArrows: () => void;
+}) => {
   const { children = {} } = useCallInfo(id) ?? {};
   const childIds = Object.keys(children);
 
   return (
     <div className="flex flex-col">
       {childIds.map(id => (
-        <Call key={id} id={id} />
+        <Call key={id} id={id} refreshArcherArrows={refreshArcherArrows} />
       ))}
     </div>
   );
@@ -498,7 +524,13 @@ const stripIndent = (source: string): string => {
     .join("\n");
 };
 
-const Trace = ({ traceId }: { traceId: string }) => {
+const Trace = ({
+  traceId,
+  refreshArcherArrows,
+}: {
+  traceId: string;
+  refreshArcherArrows: () => void;
+}) => {
   const { selectedId, setSelectedId, getExpanded, setExpanded } = useTreeContext();
   const { getParent, getChildren, getPrior, getNext } = useLinks();
 
@@ -575,7 +607,7 @@ const Trace = ({ traceId }: { traceId: string }) => {
       <div className="flex divide-x divide-gray-100 flex-1 overflow-clip">
         <div className="flex-1 p-6 overflow-y-auto flex-shrink-0">
           {firstRoot ? (
-            <CallChildren id={firstRoot} />
+            <CallChildren id={firstRoot} refreshArcherArrows={refreshArcherArrows} />
           ) : (
             <div className="flex justify-center items-center h-full">
               <Spinner size="medium" />
@@ -605,9 +637,24 @@ const useTraceId = () => {
 
 export const TracePage = () => {
   const traceId = useTraceId();
+
+  const archerContainerRef = useRef<ArcherContainerHandle | null>(null);
+  const refreshArcherArrows = useCallback(() => {
+    archerContainerRef.current?.refreshScreen();
+  }, []);
+
   return !traceId ? null : (
-    <TreeProvider key={traceId} traceId={traceId}>
-      <Trace traceId={traceId} />
-    </TreeProvider>
+    <ArcherContainer
+      ref={archerContainerRef}
+      noCurves
+      strokeColor="#E2E8F0"
+      strokeWidth={1}
+      startMarker={false}
+      endMarker={false}
+    >
+      <TreeProvider key={traceId} traceId={traceId}>
+        <Trace traceId={traceId} refreshArcherArrows={refreshArcherArrows} />
+      </TreeProvider>
+    </ArcherContainer>
   );
 };
