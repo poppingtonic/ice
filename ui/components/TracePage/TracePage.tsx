@@ -269,7 +269,10 @@ const Call = ({ id, refreshArcherArrows }: { id: string; refreshArcherArrows: ()
     <div className="mt-2 flex-shrink-0">
       <div className={classNames("flex flex-shrink-0", !focussed && "opacity-30")}>
         <Button
-          className="justify-start text-start items-start h-fit min-w-[300px] p-1.5 !shadow-none"
+          className={classNames(
+            "justify-start text-start items-start h-fit min-w-[300px] p-1.5 !shadow-none",
+            childIds.length === 0 && "ml-5",
+          )}
           variant="ghost"
           onClick={select}
           isActive={selected}
