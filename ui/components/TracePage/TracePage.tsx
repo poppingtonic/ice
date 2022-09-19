@@ -1,4 +1,3 @@
-import { ArcherContainer, ArcherElement } from "react-archer";
 import { Button, Collapse, Skeleton, useToast } from "@chakra-ui/react";
 import classNames from "classnames";
 import produce from "immer";
@@ -17,25 +16,92 @@ import {
   useRef,
   useState,
 } from "react";
+import { ArcherContainer, ArcherElement } from "react-archer";
+import { ArcherContainerHandle } from "react-archer/lib/ArcherContainer/ArcherContainer.types";
 import { JSONTree } from "react-json-tree";
 import SyntaxHighlighter from "react-syntax-highlighter";
 import Separator from "./Separator";
 import Spinner from "./Spinner";
-import { ArcherContainerHandle } from "react-archer/lib/ArcherContainer/ArcherContainer.types";
 
-const chalkLikeStyle = {
-  "hljs-keyword": { color: "rgb(45, 127, 232)" },
-  "hljs-operator": { color: "rgb(45, 127, 232)" },
-  "hljs-number": { color: "rgb(220, 50, 47)" },
-  "hljs-decorator": { color: "rgb(45, 127, 232)" },
-  "hljs-comment": { color: "rgb(133, 153, 0)" },
-  "hljs-string": { color: "rgb(44, 137, 87)" },
-  "hljs-built_in": { color: "rgb(220, 50, 47)" },
-  "hljs-class": { color: "rgb(220, 50, 47)" },
-  "hljs-module": { color: "rgb(220, 50, 47)" },
-  "hljs-punctuation": { color: "rgb(28, 88, 56)" },
-  "hljs-bracket": { color: "rgb(28, 88, 56)" },
-  "hljs-plain": { color: "rgb(128, 128, 128)" },
+const elicitStyle = {
+  "hljs-keyword": { color: "rgb(79, 70, 229)" }, // use primary color for keywords
+  "hljs-operator": { color: "rgb(79, 70, 229)" }, // use primary color for operators
+  "hljs-number": { color: "rgb(2, 132, 199)" }, // use secondary color for numbers
+  "hljs-decorator": { color: "rgb(79, 70, 229)" }, // use primary color for decorators
+  "hljs-comment": { color: "rgb(102, 153, 51)" }, // use a muted green for comments
+  "hljs-string": { color: "rgb(153, 102, 51)" }, // use a muted orange for strings
+  "hljs-built_in": { color: "rgb(2, 132, 199)" }, // use secondary color for built-ins
+  "hljs-class": { color: "rgb(2, 132, 199)" }, // use secondary color for classes
+  "hljs-module": { color: "rgb(2, 132, 199)" }, // use secondary color for modules
+  "hljs-punctuation": { color: "rgb(51, 102, 153)" }, // use a darker shade of the secondary color for punctuation
+  "hljs-bracket": { color: "rgb(51, 102, 153)" }, // use a darker shade of the secondary color for brackets
+  "hljs-plain": { color: "rgb(128, 128, 128)" }, // use a neutral gray for plain text
+};
+
+const elicitJSONTreeTheme = {
+  tree: ({ style }) => ({
+    style: { ...style, backgroundColor: undefined }, // remove default background
+  }),
+  value: ({ style }, nodeType, keyPath) => {
+    // use different colors for different node types
+    let color;
+    color = "rgb(2, 132, 199)";
+    /* switch (nodeType) {
+     *   case "Object":
+     *   case "Array":
+     *     color = "rgb(51, 102, 153)"; // use a darker shade of the secondary color for objects and arrays
+     *     break;
+     *   case "String":
+     *     color = "rgb(153, 102, 51)"; // use a muted orange for strings
+     *     break;
+     *   case "Number":
+     *     color = "rgb(2, 132, 199)"; // use secondary color for numbers
+     *     break;
+     *   case "Boolean":
+     *   case "Null":
+     *   case "Undefined":
+     *     color = "rgb(79, 70, 229)"; // use primary color for booleans, null, and undefined
+     *     break;
+     *   default:
+     *     color = "rgb(128, 128, 128)"; // use a neutral gray for other types
+     * } */
+    return {
+      style: { ...style, color },
+    };
+  },
+  label: ({ style }, nodeType, keyPath, node) => {
+    // use primary color for keys
+    return {
+      style: { ...style, color: "rgb(79, 70, 229)" },
+    };
+  },
+  nestedNode: ({ style }, keyPath, nodeType, expanded, expandable) => {
+    // use a lighter background for nested nodes
+    return {
+      style: {
+        ...style,
+        backgroundColor: expanded ? "rgb(245, 245, 245)" : undefined,
+      },
+    };
+  },
+  nestedNodeChildren: ({ style }, keyPath, nodeType, expanded, expandable) => {
+    // use a border for nested nodes
+    return {
+      style: {
+        ...style,
+        border: expanded ? "1px solid rgb(230, 230, 230)" : undefined,
+      },
+    };
+  },
+  arrow: ({ style }, nodeType, expanded) => {
+    // use primary color for arrows
+    return {
+      style: {
+        ...style,
+        color: "rgb(79, 70, 229)",
+      },
+    };
+  },
 };
 
 const getContentLength = async (path: string) => {
@@ -391,15 +457,12 @@ const Json = ({ name, value }: { name: string; value: unknown }) => {
         <JSONTree
           data={value}
           hideRoot
-          theme={{
-            tree: ({ style }) => ({
-              style: { ...style, backgroundColor: undefined }, // remove default background
-            }),
-          }}
+          theme={elicitJSONTreeTheme}
           valueRenderer={(valueAsString: string, value: unknown) =>
             typeof value === "string" ? (
               <div
                 className="whitespace-pre-line break-normal select-none"
+                style={{ color: "rgb(2, 132, 199)" }}
                 onClick={() => {
                   navigator.clipboard.writeText(value);
                   toast({ title: "Copied to clipboard", duration: 1000 });
@@ -522,7 +585,7 @@ const SourceContent = ({ source }: SourceContentProps) => {
     <SyntaxHighlighter
       language="python"
       className="bg-gray-100 p-4 rounded-md overflow-auto text-sm"
-      style={chalkLikeStyle}
+      style={elicitStyle}
       customStyle={{ backgroundColor: "transparent" }}
     >
       {strippedSource}
