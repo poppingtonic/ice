@@ -36,7 +36,10 @@ async def get_relevant_paragraphs(paper: Paper, question: str, top_n: int = 3) -
 async def answer_for_paper(paper: Paper, question: str):
     relevant_pars = await get_relevant_paragraphs(paper, question)
     relevant_str = "\n\n".join(str(p) for p in relevant_pars)
-    response = await answer(context=relevant_str, question=question)
+    if relevant_str.strip() == "":
+        response = "There is no reference to your question in the document. Please ask another question"
+    else:
+        response = await answer(context=relevant_str, question=question)
     return response
 
 recipe.main(answer_for_paper)
