@@ -239,9 +239,7 @@ class OpenAIChatCompletionAgent(Agent):
                 "model": self.model,
                 "temperature": self.temperature,
                 "top_p": self.top_p,
-                "n": 1,
-                "logprobs": self.logprobs,
-                "top_logprobs": self.top_logprobs
+                "n": 1
             }
         )
         messages = [{"role": "system", "content": "You are a helpful assistant. Your answers follow instructions and remain grounded in the context."},
